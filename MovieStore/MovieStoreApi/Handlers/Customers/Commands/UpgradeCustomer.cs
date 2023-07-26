@@ -1,5 +1,7 @@
 ﻿using FluentResults;
 using MediatR;
+using Microsoft.IdentityModel.Tokens;
+using MovieStore.Core.Enum;
 using MovieStore.Core.Model;
 using MovieStoreApi.Handlers.Http;
 using MovieStoreApi.Repositories.Interfaces;
@@ -16,10 +18,12 @@ public static class UpgradeCustomer
     public class RequestHandler : IRequestHandler<Command, Result> 
     {
         private readonly IRepository<Customer> _customerRepository;
+        private readonly IRepository<PurchasedMovie> _purchasedMovieRepository;
         
-        public RequestHandler(IRepository<Customer> customerRepository)
+        public RequestHandler(IRepository<Customer> customerRepository, IRepository<PurchasedMovie> purchasedMovieRepository)
         {
             _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
+            _purchasedMovieRepository = purchasedMovieRepository ?? throw new ArgumentNullException(nameof(purchasedMovieRepository));
         }
 
         public Task<Result> Handle(Command request, CancellationToken cancellationToken)
@@ -30,8 +34,11 @@ public static class UpgradeCustomer
             var customer = _customerRepository.GetById(request.Id);
             if (customer == null)
                 return HttpHandler.NotFound();
+
+            var purchasedMovies = _purchasedMovieRepository.Search(movie => 
+                movie.Customer == customer && movie.PurchaseDate > DateTime.Now.AddMonths(-2));
             
-            if (!customer.CanUpgrade())
+            if (purchasedMovies.ToList().Count < 2 || customer.Status == Status.Advanced)
                 return  HttpHandler.BadRequest();
             
             customer.Upgrade();

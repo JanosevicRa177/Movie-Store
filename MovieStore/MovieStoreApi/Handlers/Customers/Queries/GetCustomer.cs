@@ -2,6 +2,7 @@
 using FluentResults;
 using MediatR;
 using MovieStore.Core.Model;
+using MovieStoreApi.Dto;
 using MovieStoreApi.Handlers.Http;
 using MovieStoreApi.Repositories.Interfaces;
 
@@ -13,14 +14,12 @@ public static class GetCustomer
     {
         public Guid Id { get; set; }
     }
-
     public class Response
     {
         public Guid Id { get; set; }
-        public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
     }
-
+    
     public class RequestHandler : IRequestHandler<Query, Result<Response>>
     {
         private readonly IRepository<Customer> _customerRepository;

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MovieStore.Core.Model;
 using MovieStore.Infrastructure;
+using MovieStoreApi;
 using MovieStoreApi.Repositories;
 using MovieStoreApi.Repositories.Interfaces;
 
@@ -18,6 +19,10 @@ builder.Services.AddScoped<IRepository<PurchasedMovie>, PurchasedMovieRepository
 builder.Services.AddMediatR(cfg => {
     cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
 });
+builder.Services.AddOpenApiDocument(cfg =>
+{
+    cfg.SchemaNameGenerator = new CustomSwaggerSchemaNameGenerator();
+});
 
 var app = builder.Build();
 
@@ -27,6 +32,12 @@ using (var scope = app.Services.CreateScope())
         .GetRequiredService<MovieStoreContext>();
 
     dbContext.Database.Migrate();
+}
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseOpenApi();
+    app.UseSwaggerUi3();
 }
 
 // Configure the HTTP request pipeline.

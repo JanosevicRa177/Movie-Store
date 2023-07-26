@@ -2,6 +2,7 @@
 using FluentResults;
 using MediatR;
 using MovieStore.Core.Model;
+using MovieStoreApi.Dto;
 using MovieStoreApi.Repositories.Interfaces;
 
 namespace MovieStoreApi.Handlers.Customers.Queries;
@@ -9,11 +10,10 @@ namespace MovieStoreApi.Handlers.Customers.Queries;
 public static class GetCustomers
 {
     public class Query: IRequest<Result<IEnumerable<Response>>>{ }
-    
+
     public class Response
     {
         public Guid Id { get; set; }
-        public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
     }
 
@@ -35,7 +35,7 @@ public static class GetCustomers
             
             var customers = _customerRepository.GetAll();
             
-            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<IEnumerable<Customer>, IEnumerable<Response>>());
+            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<Customer, Response>());
             var mapper = new Mapper(mapperConfig);
             var customersDto = mapper.Map<IEnumerable<Response>>(customers);
             

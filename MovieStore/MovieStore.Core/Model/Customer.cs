@@ -21,12 +21,6 @@ public class Customer
         StatusExpirationDate = DateTime.Now.AddMonths(1);
     }
 
-    public bool CanUpgrade()
-    {
-        var purchasedMovies = PurchasedMovies.Where(pm => pm.PurchaseDate > DateTime.Now.AddMonths(-2));
-        return purchasedMovies.ToList().Count > 2 && !IsAdvanced();
-    }
-    
     public bool Has(Movie movie)
     {
         return PurchasedMovies.Any(pm => pm.Movie == movie && pm.ExpirationDate > DateTime.Now);
