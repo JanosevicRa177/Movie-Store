@@ -28,6 +28,16 @@ public class Customer
         var purchasedMovies = PurchasedMovies.Where(pm => pm.PurchaseDate > DateTime.Now.AddMonths(-2));
         return purchasedMovies.ToList().Count > 2 && !IsAdvanced();
     }
+    
+    public bool Has(Movie movie)
+    {
+        return PurchasedMovies.Any(pm => pm.Movie == movie && pm.ExpirationDate > DateTime.Now);
+    }
+
+    private bool Have(Movie movie)
+    {
+        return PurchasedMovies.Any(pm => pm.Movie == movie);
+    }
 
     private bool IsAdvanced()
     {
