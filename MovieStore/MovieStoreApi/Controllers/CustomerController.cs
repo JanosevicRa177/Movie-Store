@@ -37,8 +37,7 @@ public class CustomerController : ControllerBase
     {
         var response = await _mediator.Send(new AddCustomer.Command
         {
-                Email = customerDto.Email,
-                Name = customerDto.Name
+                Email = customerDto.Email
         });
         return response.ToCreatedResult();
     }
@@ -56,7 +55,6 @@ public class CustomerController : ControllerBase
         var response = await _mediator.Send(new UpdateCustomer.Command
         {
                 Email = customerDto.Email,
-                Name = customerDto.Name,
                 Id = id
         });
         return response.ToActionResult();

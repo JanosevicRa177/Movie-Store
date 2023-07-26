@@ -12,7 +12,6 @@ public static class UpdateCustomer
     {
         public Guid Id { get; set; }
         public string Email { get; set; } = null!;
-        public string Name { get; set; } = null!;
     }
     
     public class RequestHandler : IRequestHandler<Command,Result> 
@@ -32,7 +31,7 @@ public static class UpdateCustomer
             if (customer == null)
                 return HttpHandler.NotFound();
             
-            customer.Update(request.Name,request.Email);
+            customer.Update(request.Email);
             _customerRepository.SaveChanges();
             
             return  HttpHandler.Ok();

@@ -10,10 +10,10 @@ public class MovieStoreContext: DbContext
     {
     }
 
-    public DbSet<Customer> Customers { get; set; }
-    public DbSet<Movie> Movies { get; set; }
-    public DbSet<PurchasedMovie> PurchasedMovies { get; set; }
-    
+    public DbSet<Customer> Customers { get; set; } = null!;
+    public DbSet<Movie> Movies { get; set; } = null!;
+    public DbSet<PurchasedMovie> PurchasedMovies { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

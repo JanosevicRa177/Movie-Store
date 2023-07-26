@@ -5,16 +5,14 @@ namespace MovieStore.Core.Model;
 public class Customer
 {
     public Guid Id { get; set; }
-    public string Name { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public Status Status { get; set; }
     public Role Role { get; set; }
     public DateTime? StatusExpirationDate { get; set; }
     public IList<PurchasedMovie> PurchasedMovies { get; set; } = new List<PurchasedMovie>();
 
-    public void Update(string name, string email)
+    public void Update( string email)
     {
-        Name = name;
         Email = email;
     }
     public void Upgrade()
@@ -34,11 +32,6 @@ public class Customer
         return PurchasedMovies.Any(pm => pm.Movie == movie && pm.ExpirationDate > DateTime.Now);
     }
 
-    private bool Have(Movie movie)
-    {
-        return PurchasedMovies.Any(pm => pm.Movie == movie);
-    }
-
     private bool IsAdvanced()
     {
         return Status == Status.Advanced && StatusExpirationDate > DateTime.Now.AddMonths(-1);
@@ -46,7 +39,8 @@ public class Customer
 
     public void PurchaseMovie(Movie movie)
     {
-        var purchasedMovie = new PurchasedMovie(this, movie);
+        var purchasedMovie = new PurchasedMovie{Customer = this, Movie = movie,
+            PurchaseDate = DateTime.Now, ExpirationDate = movie.LicensingType == LicensingType.TwoDay ? DateTime.Now.AddDays(2): null};
         PurchasedMovies.Add(purchasedMovie);
     }
     

@@ -12,7 +12,6 @@ public static class AddCustomer
     public class Command : IRequest<Result> 
     {
         public string Email { get; set; } = null!;
-        public string Name { get; set; } = null!;
     }
 
     public class RequestHandler : IRequestHandler<Command,Result> 
@@ -28,7 +27,7 @@ public static class AddCustomer
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
             var customer = new Customer
-                { Email = request.Email, Name = request.Name, Role = Role.Regular, Status = Status.Regular };
+                { Email = request.Email, Role = Role.Regular, Status = Status.Regular };
             _customerRepository.Add(customer);
             _customerRepository.SaveChanges();
 

@@ -11,7 +11,6 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<MovieStoreContext>(options => 
     options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionString")));
 
-
 builder.Services.AddScoped<IRepository<Customer>, CustomerRepository>();
 builder.Services.AddScoped<IRepository<Movie>, MovieRepository>();
 builder.Services.AddScoped<IRepository<PurchasedMovie>, PurchasedMovieRepository>();
@@ -21,6 +20,14 @@ builder.Services.AddMediatR(cfg => {
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider
+        .GetRequiredService<MovieStoreContext>();
+
+    dbContext.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 
