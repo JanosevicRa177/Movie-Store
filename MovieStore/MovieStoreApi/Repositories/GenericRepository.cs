@@ -25,11 +25,6 @@ public abstract class GenericRepository<T>:IRepository<T> where T : class
         _context.Set<T>().Remove(entity);
     }
 
-    public void Edit(T entity)
-    {
-        _context.Entry<T>(entity).State = EntityState.Modified;
-    }
-
     public IEnumerable<T> GetAll()
     {
         return _context.Set<T>().ToList();
@@ -45,6 +40,6 @@ public abstract class GenericRepository<T>:IRepository<T> where T : class
         _context.SaveChanges();
     }
     public IEnumerable<T> Search(Expression<Func<T,bool>> predicate) {
-        return _context.Set<T>().Where(predicate).AsEnumerable();
+        return _context.Set<T>().Where(predicate);
     }
 }
