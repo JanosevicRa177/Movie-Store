@@ -2,6 +2,7 @@
 using MediatR;
 using MovieStore.Core.Model;
 using MovieStoreApi.Handlers.Http;
+using MovieStoreApi.Repositories;
 using MovieStoreApi.Repositories.Interfaces;
 
 namespace MovieStoreApi.Handlers.Customers.Commands;
@@ -34,15 +35,14 @@ public static class PurchaseMovie
             if (customer == null) return HttpHandler.NotFound();
             
             var movie = _movieRepository.GetById(request.MovieId);
-            
             if (movie == null) return HttpHandler.NotFound();
+
             if (customer.Has(movie)) return HttpHandler.BadRequest();
             
             customer.PurchaseMovie(movie);
             _customerRepository.SaveChanges();
             
             return HttpHandler.Ok();
-
         }
     }
     

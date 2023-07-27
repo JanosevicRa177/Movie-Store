@@ -18,12 +18,10 @@ public static class UpgradeCustomer
     public class RequestHandler : IRequestHandler<Command, Result> 
     {
         private readonly IRepository<Customer> _customerRepository;
-        private readonly IRepository<PurchasedMovie> _purchasedMovieRepository;
         
-        public RequestHandler(IRepository<Customer> customerRepository, IRepository<PurchasedMovie> purchasedMovieRepository)
+        public RequestHandler(IRepository<Customer> customerRepository)
         {
             _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
-            _purchasedMovieRepository = purchasedMovieRepository ?? throw new ArgumentNullException(nameof(purchasedMovieRepository));
         }
 
         public Task<Result> Handle(Command request, CancellationToken cancellationToken)
@@ -35,10 +33,7 @@ public static class UpgradeCustomer
             if (customer == null)
                 return HttpHandler.NotFound();
 
-            var purchasedMovies = _purchasedMovieRepository.Search(movie => 
-                movie.Customer == customer && movie.PurchaseDate > DateTime.Now.AddMonths(-2));
-            
-            if (purchasedMovies.ToList().Count < 2 || customer.Status == Status.Advanced)
+            if (!customer.CanUpgrade())
                 return  HttpHandler.BadRequest();
             
             customer.Upgrade();

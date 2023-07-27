@@ -23,12 +23,17 @@ public class Customer
 
     public bool Has(Movie movie)
     {
-        return PurchasedMovies.Any(pm => pm.Movie == movie && pm.ExpirationDate > DateTime.Now);
+        return PurchasedMovies.Any(pm => pm.Movie == movie && (pm.ExpirationDate > DateTime.Now || pm.ExpirationDate == null));
     }
 
     private bool IsAdvanced()
     {
         return Status == Status.Advanced && StatusExpirationDate > DateTime.Now.AddMonths(-1);
+    }
+    
+    public bool CanUpgrade()
+    {
+        return !IsAdvanced() && PurchasedMovies.Where(movie => movie.PurchaseDate > DateTime.Now.AddMonths(-2)).ToList().Count > 2;
     }
 
     public void PurchaseMovie(Movie movie)

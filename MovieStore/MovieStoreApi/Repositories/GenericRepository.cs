@@ -8,38 +8,38 @@ namespace MovieStoreApi.Repositories;
 public abstract class GenericRepository<T>:IRepository<T> where T : class
 {
     
-    protected readonly MovieStoreContext _context;
+    protected readonly MovieStoreContext Context;
 
     protected GenericRepository(MovieStoreContext context)
     {
-        _context = context ?? throw new ArgumentNullException(nameof(context));
+        Context = context ?? throw new ArgumentNullException(nameof(context));
     }
 
     public void Add(T entity)
     {
-        _context.Set<T>().Add(entity);
+        Context.Set<T>().Add(entity);
     }
 
     public void Delete(T entity)
     {
-        _context.Set<T>().Remove(entity);
+        Context.Set<T>().Remove(entity);
     }
 
     public IEnumerable<T> GetAll()
     {
-        return _context.Set<T>().ToList();
+        return Context.Set<T>().ToList();
     }
 
-    public T? GetById(Guid id)
+    public virtual T? GetById(Guid id)
     {
-        return _context.Set<T>().Find(id);
+        return Context.Set<T>().Find(id);
     }
 
     public void SaveChanges()
     {
-        _context.SaveChanges();
+        Context.SaveChanges();
     }
     public IEnumerable<T> Search(Expression<Func<T,bool>> predicate) {
-        return _context.Set<T>().Where(predicate);
+        return Context.Set<T>().Where(predicate);
     }
 }
