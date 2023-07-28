@@ -1,0 +1,9 @@
+<header>
+    <mat-toolbar class="toolbar">
+        <div class="flex-link-container">
+            <a *ngFor="let route of routes; let i = index" routerLink={{route.route}} routerLinkActive="active" ariaCurrentWhenActive="page">
+                <button mat-raised-button color="accent" class="button-link">{{route.name}}</button>
+            </a>
+        </div>
+    </mat-toolbar>
+</header>

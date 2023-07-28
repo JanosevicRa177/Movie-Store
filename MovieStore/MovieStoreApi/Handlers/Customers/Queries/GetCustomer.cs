@@ -37,13 +37,7 @@ public static class GetCustomer
             }
 
             var customer = _customerRepository.GetById(request.Id);
-            if (customer == null) return HttpHandler.NotFound<Response>();
-            
-            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<Customer, Response>());
-            var mapper = new Mapper(mapperConfig);
-            var customerRes = mapper.Map<Response>(customer);
-
-            return HttpHandler.Ok(customerRes);
+            return customer != null ? HttpHandler.Ok(new Response{Id = customer.Id,Email = customer.Email}) : HttpHandler.NotFound<Response>();
         }
     }
 }

@@ -6,7 +6,6 @@ using MovieStoreApi.Extensions;
 using MovieStoreApi.Handlers.Movies.Commands;
 using MovieStoreApi.Handlers.Movies.Queries;
 using MovieStoreApi.Movies.Commands;
-using MovieStoreApi.Movies.Queries;
 
 namespace MovieStoreApi.Controllers;
 
@@ -22,7 +21,7 @@ public class MovieController : ControllerBase
     }
     
     [HttpGet("{id}")]
-    public async Task<ActionResult<Movie>> GetById(Guid id)
+    public async Task<ActionResult<GetMovie.Response>> GetById(Guid id)
     {
         var response = await _mediator.Send(new GetMovie.Query{ Id = id });
         return response.ToActionResult();
@@ -38,7 +37,7 @@ public class MovieController : ControllerBase
         return response.ToCreatedResult();
     }
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Movie>>> GetAll()
+    public async Task<ActionResult<IEnumerable<GetMovies.Response>>> GetAll()
     {
         var response = await _mediator.Send(new GetMovies.Query());
         return response.ToActionResult();

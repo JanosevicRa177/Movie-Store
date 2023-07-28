@@ -26,6 +26,11 @@ builder.Services.AddOpenApiDocument(cfg =>
 
 var app = builder.Build();
 
+app.UseCors(x => x
+    .WithOrigins("http://localhost:4200")
+    .WithMethods("PUT","DELETE","POST","GET","PATCH","OPTIONS")
+    .WithHeaders("Accept","Content-Type","Access-Control-Allow-Origin"));
+
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider

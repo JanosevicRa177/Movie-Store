@@ -1,0 +1,38 @@
+.container:before,
+.container:after {
+  content: " ";
+  height: 100%;
+  position: absolute;
+  top: 0;
+  width: 15px;
+}
+.container:before {
+  box-shadow: -15px 0 15px -15px inset;
+  left: -15px;
+}
+.container:after {
+  box-shadow: 15px 0 15px -15px inset;
+  right: -15px;
+}
+
+.container {
+  background: #eeeeee;
+  margin: 0 50px;
+  position: relative;
+  width: 1140px;
+  height: auto;
+  min-height: calc(100vh - 160px);
+  background: #bbf7d0;
+}
+.inner-container {
+  margin-left: 36px;
+  margin-right: 36px;
+  margin-top: 42px;
+  margin-bottom: 42px;
+}
+.outter-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

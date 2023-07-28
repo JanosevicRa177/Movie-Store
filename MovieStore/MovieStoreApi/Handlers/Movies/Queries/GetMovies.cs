@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using AutoMapper;
 using FluentResults;
 using MediatR;
 using MovieStore.Core.Model;
@@ -9,8 +10,14 @@ namespace MovieStoreApi.Handlers.Movies.Queries;
 
 public static class GetMovies
 {
-    public class Query : IRequest<Result<IEnumerable<Movie>>> { }
-    public class RequestHandler : IRequestHandler<Query, Result<IEnumerable<Movie>>>
+    public class Query : IRequest<Result<IEnumerable<Response>>> { }
+    
+    public class Response
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+    }
+    public class RequestHandler : IRequestHandler<Query, Result<IEnumerable<Response>>>
     {
         private readonly IRepository<Movie> _movieRepository;
 
@@ -19,14 +26,18 @@ public static class GetMovies
             _movieRepository = movieRepository ?? throw new ArgumentNullException(nameof(movieRepository));
         }
 
-        public Task<Result<IEnumerable<Movie>>> Handle(Query request, CancellationToken cancellationToken)
+        public Task<Result<IEnumerable<Response>>> Handle(Query request, CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
 
             var movies = _movieRepository.GetAll();
+            
+            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<Movie, Response>());
+            var mapper = new Mapper(mapperConfig);
+            var movieDtos = mapper.Map<IEnumerable<Response>>(movies);
 
-            return HttpHandler.Ok(movies);
+            return HttpHandler.Ok(movieDtos);
         }
     }
 }
