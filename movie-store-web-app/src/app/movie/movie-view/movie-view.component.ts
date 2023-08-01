@@ -1,7 +1,7 @@
 import { ToastrService } from 'ngx-toastr';
 import { GetMoviesResponse, MovieClient } from './../../api/api-reference';
 import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import {  Router } from '@angular/router';
 
 @Component({
