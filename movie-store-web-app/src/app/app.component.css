@@ -36,3 +36,11 @@
   flex-direction: column;
   align-items: center;
 }
+
+.toolbar-spacer {
+  flex: 1 1 auto;
+}
+
+a.title {
+  color: white;
+}

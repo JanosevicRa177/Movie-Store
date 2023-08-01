@@ -7,8 +7,8 @@
             <mat-error *ngIf="customerForm.get('email')?.invalid"></mat-error>
         </mat-form-field>
     </form>
-</div>
-<div mat-dialog-actions>
-    <button mat-raised-button color="accent" [disabled]="customerForm.invalid"
-        (click)="updateCustomer()">Update</button>
+    <div mat-dialog-actions>
+        <button mat-raised-button color="accent" [disabled]="customerForm.invalid"
+            (click)="updateCustomer()">Update</button>
+    </div>
 </div>

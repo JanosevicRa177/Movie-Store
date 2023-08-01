@@ -30,7 +30,6 @@ public class CustomerController : ControllerBase
     }
     
     [HttpGet]
-    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<IEnumerable<GetCustomers.Response>>> GetAll()

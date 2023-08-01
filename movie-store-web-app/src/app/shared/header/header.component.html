@@ -1,9 +1,16 @@
 <header>
     <mat-toolbar class="toolbar">
-        <div class="flex-link-container">
-            <a *ngFor="let route of routes; let i = index" routerLink={{route.route}} routerLinkActive="active" ariaCurrentWhenActive="page">
-                <button mat-raised-button color="accent" class="button-link">{{route.name}}</button>
-            </a>
+            <div class="flex-link-container">
+                <div class="inner-flex-container">
+                <a *ngFor="let route of routes; let i = index" routerLink={{route.route}} routerLinkActive="active" ariaCurrentWhenActive="page">
+                    <button mat-raised-button class="button-link">{{route.name}}</button>
+                </a>
+            </div>
+            <div class="inner-flex-container">
+                <p *ngIf="loginDisplay" class="name-container"> Welcome, {{name}}</p>
+                <button mat-raised-button class="button-link" *ngIf="!loginDisplay" (click)="login()">Login</button>
+                <button mat-raised-button class="button-link" *ngIf="loginDisplay" (click)="logout()">Logout</button>
+            </div>
         </div>
     </mat-toolbar>
 </header>

@@ -9,12 +9,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { SharedModule } from './shared/shared.module';
 import { ToastrModule } from 'ngx-toastr';
 
-import { MsalModule, MsalRedirectComponent } from "@azure/msal-angular";
-import { PublicClientApplication } from "@azure/msal-browser";
-
-const isIE =
-    window.navigator.userAgent.indexOf("MSIE ") > -1 ||
-    window.navigator.userAgent.indexOf("Trident/") > -1;
+import { MsalGuard, MsalModule, MsalRedirectComponent } from "@azure/msal-angular";
+import { InteractionType, PublicClientApplication } from "@azure/msal-browser";
 
 @NgModule({
     declarations: [AppComponent],
@@ -32,22 +28,15 @@ const isIE =
                 auth: {
                     clientId: '4e1ff54b-bf34-4f45-83ce-e50fc32967cd',
                     authority: 'https://login.microsoftonline.com/common',
-                    redirectUri: 'http://localhost:4200',
-                    scopes: [
-                        'api://dbf7f51e-d046-435b-88ee-c4f9ee872967/to-do-lists.read',
-                        'api://dbf7f51e-d046-435b-88ee-c4f9ee872967/to-do-lists.write'
-                    ],
+                    redirectUri: 'http://localhost:4200'
                 },
                 cache: {
-                    cacheLocation: "localStorage",
-                    storeAuthStateInCookie: isIE
+                    cacheLocation: "localStorage"
                 },
-            }),
-            null,
-            null
+            }), null!, null!
         ),
     ],
-    providers: [],
+    providers: [MsalGuard],
     bootstrap: [AppComponent, MsalRedirectComponent],
 })
 export class AppModule { }

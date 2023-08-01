@@ -1,10 +1,10 @@
-.center-container{
-    display: flex;
-    flex-direction: column;
-    display: flex;
-    justify-content: center;
-    height: calc(100vh - 250px);
-    width: 100%;
+.center-container {
+  display: flex;
+  flex-direction: column;
+  display: flex;
+  justify-content: center;
+  height: calc(100vh - 250px);
+  width: 100%;
 }
 
 .flex-container {
@@ -13,25 +13,17 @@
   padding: 16px 36px;
   border-radius: 4px;
 }
-
 button {
   width: 100%;
+}
+
+button:not([disabled]) {
+  background-color: #70f4ac;
 }
 mat-form-field {
   margin-top: 8px;
   margin-bottom: 8px;
   width: 100%;
-}
-::ng-deep .mat-focused .mat-form-field-label {
-  color: #70f4ac !important;
-}
-
-::ng-deep.mat-form-field-underline {
-  background-color: #70f4ac !important;
-}
-
-::ng-deep.mat-form-field-ripple {
-  background-color: #70f4ac !important;
 }
 h1 {
   font-weight: 500;

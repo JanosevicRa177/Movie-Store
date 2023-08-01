@@ -28,17 +28,8 @@ builder.Services.AddOpenApiDocument(cfg =>
     cfg.SchemaNameGenerator = new CustomSwaggerSchemaNameGenerator();
 });
 
-builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
-
-builder.Services.AddControllersWithViews(options =>
-{
-    var policy = new AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .Build();
-    options.Filters.Add(new AuthorizeFilter(policy));
-});
-
+// builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+//     .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
 
 var app = builder.Build();
 
@@ -63,9 +54,9 @@ if (app.Environment.IsDevelopment())
 
 // Configure the HTTP request pipeline.
 
-app.UseAuthentication();
-
-app.UseAuthorization();
+// app.UseAuthentication();
+//
+// app.UseAuthorization();
 
 app.UseHttpsRedirection();
 
