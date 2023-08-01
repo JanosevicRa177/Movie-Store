@@ -11,7 +11,7 @@ public class Customer
     public DateTime? StatusExpirationDate { get; set; }
     public IList<PurchasedMovie> PurchasedMovies { get; set; } = new List<PurchasedMovie>();
 
-    public void Update( string email)
+    public void Update(string email)
     {
         Email = email;
     }
@@ -21,20 +21,17 @@ public class Customer
         StatusExpirationDate = DateTime.Now.AddMonths(1);
     }
 
-    public bool Has(Movie movie)
-    {
-        return PurchasedMovies.Any(pm => pm.Movie == movie && (pm.ExpirationDate > DateTime.Now || pm.ExpirationDate == null));
-    }
+    public bool Has(Movie movie) =>
+        PurchasedMovies.Any(pm => pm.Movie == movie && (pm.ExpirationDate > DateTime.Now || pm.ExpirationDate == null));
 
-    private bool IsAdvanced()
-    {
-        return Status == Status.Advanced && StatusExpirationDate > DateTime.Now.AddMonths(-1);
-    }
-    
-    public bool CanUpgrade()
-    {
-        return !IsAdvanced() && PurchasedMovies.Where(movie => movie.PurchaseDate > DateTime.Now.AddMonths(-2)).ToList().Count > 2;
-    }
+    private bool IsAdvanced() => 
+        StatusExpirationDate > DateTime.Now.AddMonths(-1);
+
+    public void CalculateAdvanced() => 
+        Status = IsAdvanced() ? Status.Advanced : Status.Regular;
+
+    public bool CanUpgrade() => 
+        !IsAdvanced() && PurchasedMovies.Where(movie => movie.PurchaseDate > DateTime.Now.AddMonths(-2)).ToList().Count > 2;
 
     public void PurchaseMovie(Movie movie)
     {

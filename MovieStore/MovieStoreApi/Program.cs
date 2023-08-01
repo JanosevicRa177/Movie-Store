@@ -1,4 +1,8 @@
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Web;
 using MovieStore.Core.Model;
 using MovieStore.Infrastructure;
 using MovieStoreApi;
@@ -24,11 +28,23 @@ builder.Services.AddOpenApiDocument(cfg =>
     cfg.SchemaNameGenerator = new CustomSwaggerSchemaNameGenerator();
 });
 
+builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
+
+builder.Services.AddControllersWithViews(options =>
+{
+    var policy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+    options.Filters.Add(new AuthorizeFilter(policy));
+});
+
+
 var app = builder.Build();
 
 app.UseCors(x => x
     .WithOrigins("http://localhost:4200")
-    .WithMethods("PUT","DELETE","POST","GET","PATCH","OPTIONS")
+    .WithMethods("PUT", "DELETE", "POST", "GET", "PATCH", "OPTIONS")
     .WithHeaders("Accept","Content-Type","Access-Control-Allow-Origin"));
 
 using (var scope = app.Services.CreateScope())
@@ -46,6 +62,10 @@ if (app.Environment.IsDevelopment())
 }
 
 // Configure the HTTP request pipeline.
+
+app.UseAuthentication();
+
+app.UseAuthorization();
 
 app.UseHttpsRedirection();
 

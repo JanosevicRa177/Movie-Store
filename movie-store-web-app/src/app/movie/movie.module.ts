@@ -1,15 +1,22 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MovieViewComponent } from './movie-view/movie-view.component';
-
-
+import { MatButtonModule } from '@angular/material/button';
+import { AppRoutingModule } from '../app-routing.module';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MovieNewEditViewComponent } from './movie-new-edit-view/movie-new-edit-view.component';
 
 @NgModule({
-  declarations: [
-    MovieViewComponent
-  ],
+  declarations: [MovieViewComponent, MovieNewEditViewComponent],
   imports: [
-    CommonModule
-  ]
+    CommonModule,
+    MatButtonModule,
+    AppRoutingModule,
+    MatFormFieldModule,
+    ReactiveFormsModule,
+    MatInputModule,
+  ],
 })
-export class MovieModule { }
+export class MovieModule {}

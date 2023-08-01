@@ -13,8 +13,8 @@
   min-width: calc(33% - 69px);
   min-height: 390px;
   border-radius: 4px;
-  height: 50px;
-  background-color: #212121;
+  height: auto;
+  background-color: #484444;
   padding-left: 24px;
   padding-right: 24px;
   padding-top: 36px;
@@ -28,7 +28,29 @@
   background-color: white;
 }
 .card-content {
+  display: flex;
+  flex-direction: column;
   color: white;
   font-size: large;
   text-align: center;
+  gap: 16px;
+}
+button {
+  width: 100%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  font-size: large;
+}
+.button-link {
+  width: 250px;
+  color: aquamarine !important;
+}
+h1 {
+  font-weight: 500;
+  margin-top: 4px;
+  margin-bottom: 10px;
+}
+.movie-control-container {
+  display: flex;
+  justify-content: space-between;
 }

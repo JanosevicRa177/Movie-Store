@@ -1,7 +1,20 @@
 .table-container {
   color: white;
   width: 100%;
+  border-radius: 4px;
+  overflow: hidden !important;
 }
 td {
   padding: 16px;
+}
+.table-container {
+  color: white;
+  width: 100%;
+}
+button {
+  width: 50%;
+}
+.button-cell {
+  display: flex;
+  gap: 16px;
 }

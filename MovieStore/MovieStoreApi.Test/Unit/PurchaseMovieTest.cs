@@ -36,7 +36,7 @@ public class PurchaseMovieTest
         MockGetById(_movieRepository, movie);
         var command = new PurchaseMovie.Command{CustomerId = _customer.Id, MovieId = movie.Id};
         
-        var result = _handler.Handle(command, new CancellationToken()).ToResult();
+        var result = Act(command);
         
         result.IsSuccess.Should().Be(true);
     }
@@ -50,7 +50,7 @@ public class PurchaseMovieTest
         _customer.PurchasedMovies.Add(purchasedMovie);
         var command = new PurchaseMovie.Command{CustomerId = _customer.Id, MovieId = movie.Id};
         
-        var result = _handler.Handle(command, new CancellationToken()).Result;
+        var result = Act(command);
         
         result.IsSuccess.Should().Be(true);
     }
@@ -64,7 +64,7 @@ public class PurchaseMovieTest
         _customer.PurchasedMovies.Add(purchasedMovie);
         var command = new PurchaseMovie.Command{CustomerId = _customer.Id, MovieId = movie.Id};
         
-        var result = _handler.Handle(command, new CancellationToken()).Result;
+        var result = Act(command);
         
         result.ErrorShouldHave(StatusCodes.Status400BadRequest);
     }
@@ -78,7 +78,7 @@ public class PurchaseMovieTest
         _customer.PurchasedMovies.Add(purchasedMovie);
         var command = new PurchaseMovie.Command{CustomerId = _customer.Id, MovieId = movie.Id};
         
-        var result = _handler.Handle(command, new CancellationToken()).Result;
+        var result = Act(command);
         
         result.ErrorShouldHave(StatusCodes.Status400BadRequest);
     }
@@ -89,7 +89,7 @@ public class PurchaseMovieTest
         A.CallTo(() => _movieRepository.GetById(movieId)).Returns(null);
         var command = new PurchaseMovie.Command{CustomerId = _customer.Id, MovieId = movieId};
         
-        var result = _handler.Handle(command, new CancellationToken()).Result;
+        var result = Act(command);
         
         result.ErrorShouldHave(StatusCodes.Status404NotFound);
     }
@@ -102,17 +102,16 @@ public class PurchaseMovieTest
         MockGetById(_movieRepository, movie);
         var command = new PurchaseMovie.Command{CustomerId = customerId, MovieId = movie.Id};
         
-        var result = _handler.Handle(command, new CancellationToken()).Result;
+        var result = Act(command);
         
         result.ErrorShouldHave(StatusCodes.Status404NotFound);
     }
     
-    private void MockGetById(IRepository<Movie> movieRepository,Movie movie1)
-    {
+    private Result Act(PurchaseMovie.Command command) => _handler.Handle(command, new CancellationToken()).Result;
+    
+    private static void MockGetById(IRepository<Movie> movieRepository,Movie movie1) => 
         A.CallTo(() => movieRepository.GetById(movie1.Id)).Returns(movie1);
-    }
-    private void MockGetById(IRepository<Customer> customerRepository,Customer customer)
-    {
+
+    private static void MockGetById(IRepository<Customer> customerRepository,Customer customer) => 
         A.CallTo(() => customerRepository.GetById(customer.Id)).Returns(customer);
-    }
 }

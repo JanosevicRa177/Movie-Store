@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using MediatR;
+using MovieStore.Core.Enum;
 using MovieStore.Core.Model;
 using MovieStoreApi.Handlers.Http;
 using MovieStoreApi.Repositories.Interfaces;
@@ -16,6 +17,7 @@ public static class GetMovie
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
+        public LicensingType LicensingType { get; set; }
     }
 
     public class RequestHandler : IRequestHandler<Query, Result<Response>>
@@ -33,7 +35,7 @@ public static class GetMovie
                 throw new ArgumentNullException(nameof(request));
 
             var movie = _movieRepository.GetById(request.Id);
-            return movie != null ? HttpHandler.Ok(new Response{Id = movie.Id,Name = movie.Name}) : HttpHandler.NotFound<Response>();
+            return movie != null ? HttpHandler.Ok(new Response{Id = movie.Id,Name = movie.Name, LicensingType = movie.LicensingType}) : HttpHandler.NotFound<Response>();
         }
     }
 }

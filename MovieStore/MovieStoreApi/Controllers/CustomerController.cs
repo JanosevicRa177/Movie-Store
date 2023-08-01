@@ -1,5 +1,7 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Web.Resource;
 using MovieStoreApi.Dto;
 using MovieStoreApi.Extensions;
 using MovieStoreApi.Handlers.Customers.Commands;
@@ -19,6 +21,8 @@ public class CustomerController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<GetCustomer.Response>> GetById(Guid id)
     {
         var response = await _mediator.Send(new GetCustomer.Query{ Id = id });
@@ -26,6 +30,9 @@ public class CustomerController : ControllerBase
     }
     
     [HttpGet]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<IEnumerable<GetCustomers.Response>>> GetAll()
     {
         var response = await _mediator.Send(new GetCustomers.Query());
@@ -33,6 +40,7 @@ public class CustomerController : ControllerBase
     }
     
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> Add([FromBody]CustomerDto customerDto)
     {
         var response = await _mediator.Send(new AddCustomer.Command
@@ -43,6 +51,9 @@ public class CustomerController : ControllerBase
     }
     
     [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {
         var response = await _mediator.Send(new DeleteCustomer.Command{Id = id});
@@ -50,6 +61,9 @@ public class CustomerController : ControllerBase
     }
     
     [HttpPut("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update([FromBody]CustomerDto customerDto,Guid id)
     {
         var response = await _mediator.Send(new UpdateCustomer.Command
@@ -61,6 +75,9 @@ public class CustomerController : ControllerBase
     }
     
     [HttpPost("{customerId}/buy/movie/{movieId}/")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> PurchaseMovie(Guid customerId,Guid movieId)
     {
         var response = await _mediator.Send(new PurchaseMovie.Command
@@ -71,6 +88,10 @@ public class CustomerController : ControllerBase
         return response.ToActionResult();
     }
     [HttpPatch("upgrade/advanced/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpgradeCustomer(Guid id)
     {
         var response = await _mediator.Send(new UpgradeCustomer.Command { Id = id });

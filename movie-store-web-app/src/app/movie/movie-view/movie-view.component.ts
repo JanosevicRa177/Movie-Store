@@ -1,5 +1,8 @@
+import { ToastrService } from 'ngx-toastr';
 import { GetMoviesResponse, MovieClient } from './../../api/api-reference';
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import {  Router } from '@angular/router';
 
 @Component({
   selector: 'app-movie-view',
@@ -8,7 +11,27 @@ import { Component, OnInit } from '@angular/core';
 })
 export class MovieViewComponent {
   movies: GetMoviesResponse[] = [];
-  constructor(movieClient: MovieClient) {
+  constructor(
+    private readonly toastr: ToastrService,
+    private readonly movieClient: MovieClient,
+    private readonly router: Router
+  ) {
     movieClient.getAll().subscribe((movies) => (this.movies = movies));
   }
+
+  readonly delete = (id: string) => {
+    this.movieClient.delete(id).subscribe({
+      next: () => {
+        this.movies = this.movies.filter((movie) => movie.id !== id);
+        this.toastr.success('Successfuly deleted movie');
+      },
+      error: (e: any) => this.toastr.error('Failed to delete movie'),
+    });
+  };
+  readonly openNew = () => {
+    this.router.navigate(['/movie/create']);
+  };
+  readonly openEdit = (id: string) => {
+    this.router.navigate([`/movie/edit/${id}`]);
+  };
 }

@@ -1,7 +1,8 @@
-﻿using System.Collections;
+﻿using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using FluentResults;
 using MediatR;
+using MovieStore.Core.Enum;
 using MovieStore.Core.Model;
 using MovieStoreApi.Handlers.Http;
 using MovieStoreApi.Repositories.Interfaces;
@@ -14,6 +15,7 @@ public static class GetMovies
     
     public class Response
     {
+        [Required]
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
     }

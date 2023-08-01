@@ -1,28 +1,34 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
 import { CustomerModule } from './customer/customer.module';
 import { MovieModule } from './movie/movie.module';
 import { HttpClientModule } from '@angular/common/http';
 import { SharedModule } from './shared/shared.module';
+import { ToastrModule } from 'ngx-toastr';
+
+import { MsalModule, MsalRedirectComponent } from "@azure/msal-angular";
+import { PublicClientApplication } from "@azure/msal-browser";
+
+const isIE =
+    window.navigator.userAgent.indexOf("MSIE ") > -1 ||
+    window.navigator.userAgent.indexOf("Trident/") > -1;
 
 @NgModule({
-  declarations: [AppComponent],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    BrowserAnimationsModule,
-    CustomerModule,
-    MovieModule,
-    HttpClientModule,
-    SharedModule,
-  ],
-  providers: [],
-  bootstrap: [AppComponent],
+    declarations: [AppComponent],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        CustomerModule,
+        MovieModule,
+        HttpClientModule,
+        SharedModule,
+        ToastrModule.forRoot(),
+    ],
+    providers: [],
+    bootstrap: [AppComponent, MsalRedirectComponent],
 })
-export class AppModule {}
+export class AppModule { }

@@ -1,16 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-
-export interface Route {
-  name: string;
-  route: string;
-}
+import { Component } from '@angular/core';
+import { Route } from 'src/model/utils';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css'],
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent {
   routes: Route[] = [
     {
       name: 'Home',
@@ -19,7 +15,4 @@ export class HeaderComponent implements OnInit {
     { name: 'Customers', route: '/customer/all' },
     { name: 'Movies', route: '/movie/all' },
   ];
-  constructor() {}
-
-  ngOnInit(): void {}
 }

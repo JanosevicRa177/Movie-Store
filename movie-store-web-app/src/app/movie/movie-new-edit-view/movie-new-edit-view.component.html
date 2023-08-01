@@ -1,0 +1,22 @@
+<div class="center-container">
+    <div class="flex-container">
+        <h1>Create Movie</h1>
+        <form [formGroup]="movieForm">
+            <mat-form-field>
+                <mat-label>Movie name</mat-label>
+                <input matInput placeholder="super cool movie" formControlName="name" required>
+                <mat-error *ngIf="movieForm.get('name')?.invalid">Name is required field</mat-error>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Lincesing type</mat-label>
+                <select formControlName="licensingType" matNativeControl required>
+                    <option value="0">Two day</option>
+                    <option value="1">Lifelong</option>
+                </select>
+            </mat-form-field>
+        </form>
+        <button mat-raised-button color="accent" [disabled]="movieForm.invalid" (click)="handleSubmit()">
+            {{movieId ? "Update movie" : "Create movie"}}
+        </button>
+    </div>
+</div>

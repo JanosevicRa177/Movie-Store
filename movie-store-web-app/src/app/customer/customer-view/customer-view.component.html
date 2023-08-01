@@ -1,12 +1,16 @@
 
 <table mat-table [dataSource]="customers" class="table-container">
-    <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef> Id </th>
-        <td mat-row *matCellDef="let customer"> {{customer.id}} </td>
-    </ng-container>
     <ng-container matColumnDef="email">
         <th mat-header-cell *matHeaderCellDef> email </th>
         <td mat-row *matCellDef="let customer"> {{customer.email}} </td>
+    </ng-container>
+    <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> </th>
+        <td mat-row *matCellDef="let customer" class="button-cell">
+            <button [disabled]="isAdvanced(customer)" mat-raised-button color="accent" (click)="upgrade(customer.id)">Upgrade</button>
+            <button mat-raised-button color="accent" (click)="openEdit(customer)">Edit</button>
+            <button mat-raised-button color="warn" (click)="delete(customer.id)">Delete</button>
+        </td>
     </ng-container>
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>

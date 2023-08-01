@@ -1,8 +1,7 @@
-﻿using AutoMapper;
-using FluentResults;
+﻿using FluentResults;
 using MediatR;
+using MovieStore.Core.Enum;
 using MovieStore.Core.Model;
-using MovieStoreApi.Dto;
 using MovieStoreApi.Handlers.Http;
 using MovieStoreApi.Repositories.Interfaces;
 
@@ -18,6 +17,7 @@ public static class GetCustomer
     {
         public Guid Id { get; set; }
         public string Email { get; set; } = string.Empty;
+        public Status Status { get; set; }
     }
     
     public class RequestHandler : IRequestHandler<Query, Result<Response>>
@@ -32,12 +32,13 @@ public static class GetCustomer
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             if (request == null)
-            {
                 throw new ArgumentNullException(nameof(request));
-            }
 
             var customer = _customerRepository.GetById(request.Id);
-            return customer != null ? HttpHandler.Ok(new Response{Id = customer.Id,Email = customer.Email}) : HttpHandler.NotFound<Response>();
+            if (customer == null) return HttpHandler.NotFound<Response>();
+            
+            customer.CalculateAdvanced();
+            return HttpHandler.Ok(new Response { Id = customer.Id, Email = customer.Email });
         }
     }
 }

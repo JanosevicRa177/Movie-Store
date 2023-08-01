@@ -8,7 +8,7 @@ public class CustomerConfiguration: IEntityTypeConfiguration<Customer>
 {
     public void Configure(EntityTypeBuilder<Customer> builder)
     {
-        builder
+        builder.Ignore(customer => customer.Status)
             .HasMany(customer => customer.PurchasedMovies)
             .WithOne(purchasedMovie => purchasedMovie.Customer);
     }
