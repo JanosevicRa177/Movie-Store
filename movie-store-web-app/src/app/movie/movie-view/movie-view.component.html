@@ -1,14 +1,15 @@
 <div class="movie-control-container">
     <h1>Movies</h1>
-    <button mat-raised-button (click)="openNew()" class="button-link">Create movie</button>
+    <button mat-raised-button (click)="openNew()" class="button-link" *ngIf="hasRole(1)">Create movie</button>
 </div>
 <div class="flex-container">
     <div *ngFor="let movie of movies; let i = index" class="card">
         <div class="card-image"></div>
         <div class="card-content">
-            <p>{{movie.name}}</p>
-            <button mat-raised-button color="accent" (click)="openEdit(movie.id)">Edit</button>
-            <button mat-raised-button color="warn" (click)="delete(movie.id)">Delete</button>
+            <p >{{movie.name}}</p>
+            <button mat-raised-button color="accent" *ngIf="hasRole(1)" (click)="openEdit(movie.id)">Edit</button>
+            <button mat-raised-button color="warn" *ngIf="hasRole(1)" (click)="delete(movie.id)">Delete</button>
+            <button mat-raised-button color="accent" (click)="purchaseMovie(movie.id)">Buy</button>
         </div>
     </div>
 </div>

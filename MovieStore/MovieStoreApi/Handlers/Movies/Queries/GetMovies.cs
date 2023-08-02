@@ -2,7 +2,6 @@
 using AutoMapper;
 using FluentResults;
 using MediatR;
-using MovieStore.Core.Enum;
 using MovieStore.Core.Model;
 using MovieStoreApi.Handlers.Http;
 using MovieStoreApi.Repositories.Interfaces;

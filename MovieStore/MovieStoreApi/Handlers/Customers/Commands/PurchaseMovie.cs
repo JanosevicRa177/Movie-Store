@@ -11,16 +11,16 @@ public static class PurchaseMovie
 {
     public class Command : IRequest<Result> 
     {
-        public Guid CustomerId { get; set; }
+        public string CustomerEmail { get; set; }
         public Guid MovieId { get; set; }
     }
 
     public class RequestHandler : IRequestHandler<Command, Result> 
     {
-        private readonly IRepository<Customer> _customerRepository;
+        private readonly ICustomerRepository _customerRepository;
         private readonly IRepository<Movie> _movieRepository;
         
-        public RequestHandler(IRepository<Customer> customerRepository, IRepository<Movie> movieRepository)
+        public RequestHandler(ICustomerRepository customerRepository, IRepository<Movie> movieRepository)
         {
             _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
             _movieRepository = movieRepository ?? throw new ArgumentNullException(nameof(movieRepository));
@@ -31,7 +31,7 @@ public static class PurchaseMovie
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
 
-            var customer = _customerRepository.GetById(request.CustomerId);
+            var customer = _customerRepository.Search(x => x.Email == request.CustomerEmail).FirstOrDefault();
             if (customer == null) return HttpHandler.NotFound();
             
             var movie = _movieRepository.GetById(request.MovieId);

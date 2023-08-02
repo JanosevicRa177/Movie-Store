@@ -3,7 +3,7 @@
             <div class="flex-link-container">
                 <div class="inner-flex-container">
                 <a *ngFor="let route of routes; let i = index" routerLink={{route.route}} routerLinkActive="active" ariaCurrentWhenActive="page">
-                    <button mat-raised-button class="button-link">{{route.name}}</button>
+                    <button mat-raised-button class="button-link" *ngIf="shouldShow(route)">{{route.name}}</button>
                 </a>
             </div>
             <div class="inner-flex-container">

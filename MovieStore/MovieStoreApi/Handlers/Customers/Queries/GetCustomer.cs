@@ -22,9 +22,9 @@ public static class GetCustomer
     
     public class RequestHandler : IRequestHandler<Query, Result<Response>>
     {
-        private readonly IRepository<Customer> _customerRepository;
+        private readonly ICustomerRepository _customerRepository;
 
-        public RequestHandler(IRepository<Customer> customerRepository)
+        public RequestHandler(ICustomerRepository customerRepository)
         {
             _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
         }

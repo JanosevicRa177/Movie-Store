@@ -23,9 +23,9 @@ public static class GetCustomers
 
     public class RequestHandler : IRequestHandler<Query, Result<IEnumerable<Response>>>
     {
-        private readonly IRepository<Customer> _customerRepository;
+        private readonly ICustomerRepository _customerRepository;
 
-        public RequestHandler(IRepository<Customer> customerRepository)
+        public RequestHandler(ICustomerRepository customerRepository)
         {
             _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
         }

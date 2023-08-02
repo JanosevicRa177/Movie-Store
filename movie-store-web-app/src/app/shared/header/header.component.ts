@@ -1,6 +1,11 @@
+
+import { CustomerClient, GetCurrentCustomerRoleResponse, Role } from './../../api/api-reference';
 import { Component } from '@angular/core';
 import { MsalService } from '@azure/msal-angular';
 import { Route } from '../../../model/utils';
+import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
+import { RoleService } from 'src/app/services/role.service';
 
 @Component({
     selector: 'app-header',
@@ -12,30 +17,60 @@ export class HeaderComponent {
         {
             name: 'Home',
             route: '/',
+            protected: false
         },
-        { name: 'Customers', route: '/customer/all' },
-        { name: 'Movies', route: '/movie/all' },
+        { name: 'Customers', route: '/customer/all', protected: true, role: Role.Administrator },
+        { name: 'Movies', route: '/movie/all', protected: true },
     ];
     loginDisplay = false;
+    role: Role = Role.Regular;
     name = "";
 
-    constructor(private readonly authService: MsalService) {
+    constructor(private readonly authService: MsalService,
+        private readonly toastr: ToastrService,
+        private readonly router: Router,
+        private readonly customerClient: CustomerClient,
+        private readonly roleService: RoleService) {
+        this.roleService.userRole$.subscribe(innerRole => {
+            this.role = innerRole
+        })
         this.setLoginDisplay();
     }
 
-    login() {
-        this.authService.loginPopup().subscribe(_ => {
+    readonly login = () => {
+        this.authService.loginPopup().subscribe({
+            next: () => {
+                this.getCurrentCustomer();
+                this.toastr.success("Successfully logged in!")
+            },
+            error: () => {
+                this.toastr.error("Login failed!")
+            },
+        });
+    }
+
+    readonly shouldShow = (route: Route): boolean => {
+        const roleValid = route.role == null || route.role == this.role;
+        return roleValid && (!route.protected || this.loginDisplay)
+    }
+
+
+
+    readonly getCurrentCustomer = () => {
+        this.customerClient.getCurrentCustomerRole().subscribe((res: GetCurrentCustomerRoleResponse) => {
+            this.roleService.updateRole(res.role)
             this.setLoginDisplay()
         });
     }
 
-    logout() {
+    readonly logout = () => {
         this.authService.logoutPopup().subscribe(_ => {
+            this.router.navigate(['/']);
             this.setLoginDisplay()
         });
     }
 
-    setLoginDisplay() {
+    readonly setLoginDisplay = () => {
         this.loginDisplay = this.authService.instance.getAllAccounts().length > 0;
         if (this.loginDisplay) {
             const account = this.authService.instance.getAllAccounts()[0];

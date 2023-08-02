@@ -1,7 +1,7 @@
-﻿using MediatR;
+﻿using System.Security.Claims;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Web.Resource;
 using MovieStoreApi.Dto;
 using MovieStoreApi.Extensions;
 using MovieStoreApi.Handlers.Customers.Commands;
@@ -11,6 +11,7 @@ namespace MovieStoreApi.Controllers;
 
 [ApiController]
 [Route("customer")]
+[Authorize]
 public class CustomerController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -28,7 +29,7 @@ public class CustomerController : ControllerBase
         var response = await _mediator.Send(new GetCustomer.Query{ Id = id });
         return response.ToActionResult();
     }
-    
+
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -39,8 +40,9 @@ public class CustomerController : ControllerBase
     }
     
     [HttpPost]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> Add([FromBody]CustomerDto customerDto)
+    public async Task<IActionResult> Add(CustomerDto customerDto)
     {
         var response = await _mediator.Send(new AddCustomer.Command
         {
@@ -49,7 +51,23 @@ public class CustomerController : ControllerBase
         return response.ToCreatedResult();
     }
     
+    [AllowAnonymous]
+    [HttpGet("current")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<GetCurrentCustomerRole.Response>> GetCurrentCustomerRole()
+    {
+        var email = GetUserEmail();
+        var currentCustomerResponse = await _mediator.Send(new GetCurrentCustomerRole.Query()
+        {
+            Email = email
+        });
+
+        return currentCustomerResponse.ToActionResult();
+    }
+
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Administrator")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -73,16 +91,18 @@ public class CustomerController : ControllerBase
         return response.ToActionResult();
     }
     
-    [HttpPost("{customerId}/buy/movie/{movieId}/")]
+    [HttpPost("buy/movie/{movieId}/")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> PurchaseMovie(Guid customerId,Guid movieId)
+    public async Task<IActionResult> PurchaseMovie(Guid movieId)
     {
+        var email = GetUserEmail();
         var response = await _mediator.Send(new PurchaseMovie.Command
         {
-                CustomerId = customerId,
-                MovieId = movieId
+                MovieId = movieId,
+                CustomerEmail = email
+                
         });
         return response.ToActionResult();
     }
@@ -95,5 +115,11 @@ public class CustomerController : ControllerBase
     {
         var response = await _mediator.Send(new UpgradeCustomer.Command { Id = id });
         return response.ToActionResult();
+    }
+    
+    private string GetUserEmail()
+    {
+        var email = HttpContext.User.FindFirstValue("preferred_username");
+        return email;
     }
 }

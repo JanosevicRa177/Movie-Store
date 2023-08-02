@@ -1,15 +1,16 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MovieStore.Core.Model;
 using MovieStoreApi.Dto;
 using MovieStoreApi.Extensions;
 using MovieStoreApi.Handlers.Movies.Commands;
 using MovieStoreApi.Handlers.Movies.Queries;
-using MovieStoreApi.Movies.Commands;
 
 namespace MovieStoreApi.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("movie")]
 public class MovieController : ControllerBase
 {

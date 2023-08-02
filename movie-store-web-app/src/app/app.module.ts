@@ -5,11 +5,11 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CustomerModule } from './customer/customer.module';
 import { MovieModule } from './movie/movie.module';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { SharedModule } from './shared/shared.module';
 import { ToastrModule } from 'ngx-toastr';
 
-import { MsalGuard, MsalModule, MsalRedirectComponent } from "@azure/msal-angular";
+import { MsalInterceptor, MsalModule } from "@azure/msal-angular";
 import { InteractionType, PublicClientApplication } from "@azure/msal-browser";
 
 @NgModule({
@@ -28,15 +28,26 @@ import { InteractionType, PublicClientApplication } from "@azure/msal-browser";
                 auth: {
                     clientId: '4e1ff54b-bf34-4f45-83ce-e50fc32967cd',
                     authority: 'https://login.microsoftonline.com/common',
-                    redirectUri: 'http://localhost:4200'
+                    redirectUri: 'http://localhost:4200',
                 },
                 cache: {
                     cacheLocation: "localStorage"
                 },
-            }), null!, null!
+            }), null!, {
+            // MSAL Interceptor Configurations
+            interactionType: InteractionType.Redirect,
+            protectedResourceMap: new Map([
+                ["http://localhost:8085", ['api://dbf7f51e-d046-435b-88ee-c4f9ee872967/to-do-lists.read', 'api://dbf7f51e-d046-435b-88ee-c4f9ee872967/to-do-lists.write']],
+            ])
+        }
         ),
     ],
-    providers: [MsalGuard],
-    bootstrap: [AppComponent, MsalRedirectComponent],
+    providers: [
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: MsalInterceptor,
+            multi: true
+        },],
+    bootstrap: [AppComponent],
 })
 export class AppModule { }

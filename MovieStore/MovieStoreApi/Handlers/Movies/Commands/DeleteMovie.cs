@@ -1,11 +1,10 @@
 ﻿using FluentResults;
 using MediatR;
 using MovieStore.Core.Model;
-using MovieStoreApi.Errors;
 using MovieStoreApi.Handlers.Http;
 using MovieStoreApi.Repositories.Interfaces;
 
-namespace MovieStoreApi.Movies.Commands;
+namespace MovieStoreApi.Handlers.Movies.Commands;
 
 public static class DeleteMovie
 {

@@ -1,6 +1,4 @@
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using MovieStore.Core.Model;
@@ -16,7 +14,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<MovieStoreContext>(options => 
     options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionString")));
 
-builder.Services.AddScoped<IRepository<Customer>, CustomerRepository>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IRepository<Movie>, MovieRepository>();
 builder.Services.AddScoped<IRepository<PurchasedMovie>, PurchasedMovieRepository>();
 
@@ -28,15 +26,15 @@ builder.Services.AddOpenApiDocument(cfg =>
     cfg.SchemaNameGenerator = new CustomSwaggerSchemaNameGenerator();
 });
 
-// builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-//     .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
 var app = builder.Build();
 
 app.UseCors(x => x
     .WithOrigins("http://localhost:4200")
-    .WithMethods("PUT", "DELETE", "POST", "GET", "PATCH", "OPTIONS")
-    .WithHeaders("Accept","Content-Type","Access-Control-Allow-Origin"));
+    .AllowAnyMethod()
+    .AllowAnyHeader());
 
 using (var scope = app.Services.CreateScope())
 {
@@ -54,9 +52,9 @@ if (app.Environment.IsDevelopment())
 
 // Configure the HTTP request pipeline.
 
-// app.UseAuthentication();
-//
-// app.UseAuthorization();
+app.UseAuthentication();
+
+app.UseAuthorization();
 
 app.UseHttpsRedirection();
 

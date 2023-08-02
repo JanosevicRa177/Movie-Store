@@ -2,11 +2,10 @@
 using MediatR;
 using MovieStore.Core.Enum;
 using MovieStore.Core.Model;
-using MovieStoreApi.Errors;
 using MovieStoreApi.Handlers.Http;
 using MovieStoreApi.Repositories.Interfaces;
 
-namespace MovieStoreApi.Movies.Commands;
+namespace MovieStoreApi.Handlers.Movies.Commands;
 
 public abstract class UpdateMovie
 {
