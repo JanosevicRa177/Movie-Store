@@ -2,7 +2,6 @@
 using MediatR;
 using MovieStore.Core.Model;
 using MovieStoreApi.Handlers.Http;
-using MovieStoreApi.Repositories;
 using MovieStoreApi.Repositories.Interfaces;
 
 namespace MovieStoreApi.Handlers.Customers.Commands;
@@ -11,16 +10,16 @@ public static class PurchaseMovie
 {
     public class Command : IRequest<Result> 
     {
-        public string CustomerEmail { get; set; }
+        public string CustomerEmail { get; set; } = null!;
         public Guid MovieId { get; set; }
     }
 
     public class RequestHandler : IRequestHandler<Command, Result> 
     {
-        private readonly ICustomerRepository _customerRepository;
+        private readonly IRepository<Customer> _customerRepository;
         private readonly IRepository<Movie> _movieRepository;
         
-        public RequestHandler(ICustomerRepository customerRepository, IRepository<Movie> movieRepository)
+        public RequestHandler(IRepository<Customer> customerRepository, IRepository<Movie> movieRepository)
         {
             _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
             _movieRepository = movieRepository ?? throw new ArgumentNullException(nameof(movieRepository));

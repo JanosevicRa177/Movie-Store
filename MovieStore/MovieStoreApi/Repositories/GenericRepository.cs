@@ -39,7 +39,7 @@ public abstract class GenericRepository<T>:IRepository<T> where T : class
     {
         Context.SaveChanges();
     }
-    public IEnumerable<T> Search(Expression<Func<T,bool>> predicate) {
+    public virtual IEnumerable<T> Search(Expression<Func<T,bool>> predicate) {
         return Context.Set<T>().Where(predicate);
     }
 }

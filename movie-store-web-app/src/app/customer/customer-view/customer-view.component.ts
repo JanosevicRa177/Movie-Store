@@ -35,9 +35,12 @@ export class CustomerViewComponent {
         });
     };
 
-    readonly upgrade = (id: string) => {
-        this.customerClient.upgradeCustomer(id).subscribe({
-            next: () => this.toastr.success('Successfuly upgraded customer'),
+    readonly upgrade = (customer: GetCustomersResponse) => {
+        this.customerClient.upgradeCustomer(customer.id).subscribe({
+            next: () => {
+                this.toastr.success('Successfuly upgraded customer')
+                customer.status = Status.Advanced
+            },
             error: () => this.toastr.error('Failed to upgrade customer'),
         });
     };

@@ -1,6 +1,6 @@
 import { RoleService } from './../../services/role.service';
 import { ToastrService } from 'ngx-toastr';
-import { GetMoviesResponse, MovieClient, Role, CustomerClient } from './../../api/api-reference';
+import { GetMoviesResponse, MovieClient, Role, CustomerClient, LicensingType } from './../../api/api-reference';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
@@ -49,4 +49,8 @@ export class MovieViewComponent {
     readonly hasRole = (role: Role): boolean => {
         return this.role == role
     };
+
+    readonly isLicenceLifelong = (license: LicensingType): boolean => {
+        return license == LicensingType.Lifelong;
+    }
 }

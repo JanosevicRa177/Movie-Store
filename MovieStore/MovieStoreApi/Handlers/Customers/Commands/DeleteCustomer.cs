@@ -15,8 +15,8 @@ public static class DeleteCustomer
 
     public class RequestHandler : IRequestHandler<Command,Result> 
         {
-            private readonly ICustomerRepository _customerRepository;
-            public RequestHandler(ICustomerRepository customerRepository)
+            private readonly IRepository<Customer> _customerRepository;
+            public RequestHandler(IRepository<Customer> customerRepository)
             {
                 _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
             }

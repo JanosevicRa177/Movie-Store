@@ -14,7 +14,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<MovieStoreContext>(options => 
     options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionString")));
 
-builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IRepository<Customer>, CustomerRepository>();
 builder.Services.AddScoped<IRepository<Movie>, MovieRepository>();
 builder.Services.AddScoped<IRepository<PurchasedMovie>, PurchasedMovieRepository>();
 

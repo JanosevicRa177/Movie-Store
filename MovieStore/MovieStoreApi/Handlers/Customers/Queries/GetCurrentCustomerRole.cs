@@ -22,9 +22,9 @@ public static class GetCurrentCustomerRole
     }
     public class RequestHandler : IRequestHandler<Query, Result<Response>>
     {
-        private readonly ICustomerRepository _customerRepository;
+        private readonly IRepository<Customer> _customerRepository;
 
-        public RequestHandler(ICustomerRepository customerRepository)
+        public RequestHandler(IRepository<Customer> customerRepository)
         {
             _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
         }
@@ -34,7 +34,7 @@ public static class GetCurrentCustomerRole
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
 
-            var customer = _customerRepository.GetByEmail(request.Email);
+            var customer = _customerRepository.Search(x => x.Email == request.Email).FirstOrDefault();
             if (customer != null) return HttpHandler.Ok(new Response { Role = customer.Role });
             
             customer = new Customer

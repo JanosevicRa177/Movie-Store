@@ -1,11 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using MovieStore.Core.Model;
 using MovieStore.Infrastructure;
-using MovieStoreApi.Repositories.Interfaces;
 
 namespace MovieStoreApi.Repositories;
 
-public class CustomerRepository :GenericRepository<Customer>,ICustomerRepository
+public class CustomerRepository :GenericRepository<Customer>
 {
     public CustomerRepository(MovieStoreContext ctx):base(ctx)
     {
@@ -16,8 +16,7 @@ public class CustomerRepository :GenericRepository<Customer>,ICustomerRepository
        return Context.Customers.Include(customer =>customer.PurchasedMovies).ThenInclude(movie => movie.Movie).FirstOrDefault(customer => customer.Id == id);
     }
     
-    public Customer? GetByEmail(string email)
-    {
-        return Context.Customers.Include(customer =>customer.PurchasedMovies).ThenInclude(movie => movie.Movie).FirstOrDefault(customer => customer.Email == email);
+    public override IEnumerable<Customer> Search(Expression<Func<Customer,bool>> predicate) {
+        return Context.Set<Customer>().Include(customer =>customer.PurchasedMovies).ThenInclude(movie => movie.Movie).Where(predicate);
     }
 }

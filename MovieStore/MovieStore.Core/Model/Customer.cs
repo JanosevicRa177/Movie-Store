@@ -10,7 +10,7 @@ public class Customer
     public Role Role { get; set; }
     public DateTime? StatusExpirationDate { get; set; }
     public IList<PurchasedMovie> PurchasedMovies { get; set; } = new List<PurchasedMovie>();
-    public int MoneySpent { get; set; }
+    public double MoneySpent { get; set; }
 
     public void Update(string email)
     {
@@ -41,8 +41,8 @@ public class Customer
             _ => throw new InvalidOperationException()
         };
         if (this.IsAdvanced())
-            price = price * 0.8;
-        MoneySpent += Convert.ToInt32(price);
+            price *=  0.8;
+        MoneySpent += price;
         var purchasedMovie = new PurchasedMovie{Customer = this, Movie = movie,
             PurchaseDate = DateTime.Now, ExpirationDate = movie.LicensingType == LicensingType.TwoDay ? DateTime.Now.AddDays(2): null};
         PurchasedMovies.Add(purchasedMovie);

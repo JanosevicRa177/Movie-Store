@@ -4,7 +4,7 @@ import { MsalService } from '@azure/msal-angular';
 import { Role } from '../api/api-reference';
 import { RoleService } from '../services/role.service';
 
-export const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
+export const authGuard: CanActivateFn = async (route: ActivatedRouteSnapshot) => {
     const authService = inject(MsalService);
     const roleService = inject(RoleService);
     let userRole;

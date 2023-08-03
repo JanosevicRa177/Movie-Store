@@ -6,6 +6,7 @@ import { Route } from '../../../model/utils';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { RoleService } from 'src/app/services/role.service';
+import { lastValueFrom } from 'rxjs';
 
 @Component({
     selector: 'app-header',
@@ -34,13 +35,13 @@ export class HeaderComponent {
         this.roleService.userRole$.subscribe(innerRole => {
             this.role = innerRole
         })
-        this.setLoginDisplay();
+        this.setupCurrentCustomer()
     }
 
     readonly login = () => {
         this.authService.loginPopup().subscribe({
             next: () => {
-                this.getCurrentCustomer();
+                this.setupCurrentCustomer()
                 this.toastr.success("Successfully logged in!")
             },
             error: () => {
@@ -49,24 +50,16 @@ export class HeaderComponent {
         });
     }
 
-    readonly shouldShow = (route: Route): boolean => {
-        const roleValid = route.role == null || route.role == this.role;
-        return roleValid && (!route.protected || this.loginDisplay)
-    }
-
-
-
-    readonly getCurrentCustomer = () => {
-        this.customerClient.getCurrentCustomerRole().subscribe((res: GetCurrentCustomerRoleResponse) => {
-            this.roleService.updateRole(res.role)
-            this.setLoginDisplay()
-        });
-    }
-
     readonly logout = () => {
         this.authService.logoutPopup().subscribe(_ => {
             this.router.navigate(['/']);
             this.setLoginDisplay()
+        });
+    }
+
+    readonly setupCurrentCustomer = () => {
+        this.roleService.getCustomerRole().then(() => {
+            this.setLoginDisplay();
         });
     }
 
@@ -79,4 +72,10 @@ export class HeaderComponent {
         }
         else this.name = "";
     }
+
+    readonly shouldShow = (route: Route): boolean => {
+        const roleValid = route.role == null || route.role == this.role;
+        return roleValid && (!route.protected || this.loginDisplay)
+    }
+
 }

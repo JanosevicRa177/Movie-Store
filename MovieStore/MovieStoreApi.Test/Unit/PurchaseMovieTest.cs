@@ -13,7 +13,7 @@ namespace MovieStoreApi.Test.Unit;
 [TestFixture]
 public class PurchaseMovieTest
 {
-    private ICustomerRepository _customerRepository = null!;
+    private IRepository<Customer> _customerRepository = null!;
     private IRepository<Movie> _movieRepository = null!;
     private Customer _customer = null!;
     private PurchaseMovie.RequestHandler _handler = null!;
@@ -21,12 +21,12 @@ public class PurchaseMovieTest
     [SetUp]
     public void Setup()
     {
-        _customerRepository = A.Fake<ICustomerRepository>();
+        _customerRepository = A.Fake<IRepository<Customer>>();
         _movieRepository = A.Fake<IRepository<Movie>>();
         _handler = new PurchaseMovie.RequestHandler(_customerRepository, _movieRepository);
 
         _customer = new Customer {Email = "email1@gmail.com",Id = Guid.NewGuid(),Status = Status.Regular};
-        MockGetByEmail(_customerRepository, _customer);
+        MockGetById(_customerRepository, _customer);
     }
 
     [Test]
@@ -96,11 +96,11 @@ public class PurchaseMovieTest
     [Test]
     public void Customer_Does_Not_Exists_Fail()
     {
-        var customerEmail = "asd@gmail.com";
-        A.CallTo(() => _customerRepository.GetByEmail(customerEmail)).Returns(null);
+        var email = "something@gmail.com";
+        A.CallTo(() => _customerRepository.GetById(new Guid())).Returns(null);
         var movie = new Movie { Id = Guid.NewGuid(), Name = "Insidious", LicensingType = LicensingType.Lifelong };
         MockGetById(_movieRepository, movie);
-        var command = new PurchaseMovie.Command{CustomerEmail = customerEmail, MovieId = movie.Id};
+        var command = new PurchaseMovie.Command{CustomerEmail = email, MovieId = movie.Id};
         
         var result = Act(command);
         
@@ -112,6 +112,6 @@ public class PurchaseMovieTest
     private static void MockGetById(IRepository<Movie> movieRepository,Movie movie1) => 
         A.CallTo(() => movieRepository.GetById(movie1.Id)).Returns(movie1);
 
-    private static void MockGetByEmail(ICustomerRepository customerRepository,Customer customer) => 
-        A.CallTo(() => customerRepository.GetByEmail(customer.Email)).Returns(customer);
+    private static void MockGetById(IRepository<Customer> customerRepository,Customer customer) => 
+        A.CallTo(() => customerRepository.GetById(customer.Id)).Returns(customer);
 }

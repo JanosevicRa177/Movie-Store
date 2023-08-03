@@ -1139,6 +1139,7 @@ export interface IMovieDto {
 export class GetMoviesResponse implements IGetMoviesResponse {
     id!: string;
     name?: string;
+    licensingType!: LicensingType;
 
     constructor(data?: IGetMoviesResponse) {
         if (data) {
@@ -1153,6 +1154,7 @@ export class GetMoviesResponse implements IGetMoviesResponse {
         if (_data) {
             this.id = _data["id"];
             this.name = _data["name"];
+            this.licensingType = _data["licensingType"];
         }
     }
 
@@ -1167,6 +1169,7 @@ export class GetMoviesResponse implements IGetMoviesResponse {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["name"] = this.name;
+        data["licensingType"] = this.licensingType;
         return data;
     }
 }
@@ -1174,6 +1177,7 @@ export class GetMoviesResponse implements IGetMoviesResponse {
 export interface IGetMoviesResponse {
     id: string;
     name?: string;
+    licensingType: LicensingType;
 }
 
 export class ApiException extends Error {

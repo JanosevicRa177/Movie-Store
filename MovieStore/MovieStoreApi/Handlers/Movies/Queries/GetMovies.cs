@@ -2,6 +2,7 @@
 using AutoMapper;
 using FluentResults;
 using MediatR;
+using MovieStore.Core.Enum;
 using MovieStore.Core.Model;
 using MovieStoreApi.Handlers.Http;
 using MovieStoreApi.Repositories.Interfaces;
@@ -17,6 +18,8 @@ public static class GetMovies
         [Required]
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
+        [Required]
+        public LicensingType LicensingType { get; set; }
     }
     public class RequestHandler : IRequestHandler<Query, Result<IEnumerable<Response>>>
     {

@@ -9,7 +9,8 @@
             <p >{{movie.name}}</p>
             <button mat-raised-button color="accent" *ngIf="hasRole(1)" (click)="openEdit(movie.id)">Edit</button>
             <button mat-raised-button color="warn" *ngIf="hasRole(1)" (click)="delete(movie.id)">Delete</button>
-            <button mat-raised-button color="accent" (click)="purchaseMovie(movie.id)">Buy</button>
+            <button mat-raised-button color="accent" (click)="purchaseMovie(movie.id)">{{isLicenceLifelong(movie.licensingType) ? "Buy" 
+                : "Rent"}}</button>
         </div>
     </div>
 </div>

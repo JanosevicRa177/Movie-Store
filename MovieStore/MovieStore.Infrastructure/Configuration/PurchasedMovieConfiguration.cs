@@ -8,5 +8,7 @@ public class PurchasedMovieConfiguration: IEntityTypeConfiguration<PurchasedMovi
 {
     public void Configure(EntityTypeBuilder<PurchasedMovie> builder)
     {
+        builder.HasOne(purchasedMovie => purchasedMovie.Customer);
+        builder.HasOne(purchasedMovie => purchasedMovie.Movie);
     }
 }

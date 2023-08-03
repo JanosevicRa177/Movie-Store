@@ -7,7 +7,7 @@
     <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef> </th>
         <td mat-row *matCellDef="let customer" class="button-cell">
-            <button [disabled]="isAdvanced(customer)" mat-raised-button color="accent" (click)="upgrade(customer.id)">Upgrade</button>
+            <button [disabled]="isAdvanced(customer)" mat-raised-button color="accent" (click)="upgrade(customer)">Upgrade</button>
             <button mat-raised-button color="accent" (click)="openEdit(customer)">Edit</button>
             <button mat-raised-button color="warn" (click)="delete(customer.id)">Delete</button>
         </td>

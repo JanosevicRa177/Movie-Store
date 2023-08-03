@@ -13,14 +13,14 @@ namespace MovieStoreApi.Test.Unit;
 [TestFixture]
 public class UpgradeCustomerTest
 {
-    private ICustomerRepository _customerRepository = null!;
+    private IRepository<Customer> _customerRepository = null!;
     private UpgradeCustomer.RequestHandler _handler = null!;
     private Customer _regularCustomer = null!;
 
     [SetUp]
     public void Setup()
     {
-        _customerRepository = A.Fake<ICustomerRepository>();
+        _customerRepository = A.Fake<IRepository<Customer>>();
         _handler = new UpgradeCustomer.RequestHandler(_customerRepository);
         _regularCustomer = new Customer {Email = "regular@gmail.com",Id = Guid.NewGuid(),Status = Status.Regular, MoneySpent = 1300}; 
     }
