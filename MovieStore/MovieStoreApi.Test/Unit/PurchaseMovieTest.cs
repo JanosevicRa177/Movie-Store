@@ -4,6 +4,7 @@ using FluentResults;
 using Microsoft.AspNetCore.Http;
 using MovieStore.Core.Enum;
 using MovieStore.Core.Model;
+using MovieStore.Core.ValueObjects;
 using MovieStoreApi.Handlers.Customers.Commands;
 using MovieStoreApi.Repositories.Interfaces;
 using MovieStoreApi.Test.Extensions;
@@ -25,7 +26,7 @@ public class PurchaseMovieTest
         _movieRepository = A.Fake<IRepository<Movie>>();
         _handler = new PurchaseMovie.RequestHandler(_customerRepository, _movieRepository);
 
-        _customer = new Customer {Email = "email1@gmail.com",Id = Guid.NewGuid(),Status = Status.Regular};
+        _customer = new Customer {Email = Email.Create( "email1@gmail.com").Value,Id = Guid.NewGuid(),Status = Status.Regular};
         MockGetById(_customerRepository, _customer);
     }
 
@@ -34,7 +35,7 @@ public class PurchaseMovieTest
     {
         var movie = new Movie { Id = Guid.NewGuid(), Name = "Insidious", LicensingType = LicensingType.Lifelong };
         MockGetById(_movieRepository, movie);
-        var command = new PurchaseMovie.Command{CustomerEmail = _customer.Email, MovieId = movie.Id};
+        var command = new PurchaseMovie.Command{CustomerEmail = "email1@gmail.com", MovieId = movie.Id};
         
         var result = Act(command);
         
@@ -48,7 +49,7 @@ public class PurchaseMovieTest
         MockGetById(_movieRepository, movie);
         var purchasedMovie = new PurchasedMovie {ExpirationDate = DateTime.Now.AddDays(-1),Customer = _customer,Movie = movie};
         _customer.PurchasedMovies.Add(purchasedMovie);
-        var command = new PurchaseMovie.Command{CustomerEmail = _customer.Email, MovieId = movie.Id};
+        var command = new PurchaseMovie.Command{CustomerEmail = "email1@gmail.com", MovieId = movie.Id};
         
         var result = Act(command);
         
@@ -62,7 +63,7 @@ public class PurchaseMovieTest
         MockGetById(_movieRepository, movie);
         var purchasedMovie = new PurchasedMovie {ExpirationDate = DateTime.Now.AddDays(1),Customer = _customer,Movie = movie};
         _customer.PurchasedMovies.Add(purchasedMovie);
-        var command = new PurchaseMovie.Command{CustomerEmail = _customer.Email, MovieId = movie.Id};
+        var command = new PurchaseMovie.Command{CustomerEmail = "email1@gmail.com", MovieId = movie.Id};
         
         var result = Act(command);
         
@@ -76,7 +77,7 @@ public class PurchaseMovieTest
         MockGetById(_movieRepository, movie);
         var purchasedMovie = new PurchasedMovie {Customer = _customer,Movie = movie};
         _customer.PurchasedMovies.Add(purchasedMovie);
-        var command = new PurchaseMovie.Command{CustomerEmail = _customer.Email, MovieId = movie.Id};
+        var command = new PurchaseMovie.Command{CustomerEmail = "email1@gmail.com", MovieId = movie.Id};
         
         var result = Act(command);
         
@@ -87,7 +88,7 @@ public class PurchaseMovieTest
     {
         var movieId = Guid.NewGuid();
         A.CallTo(() => _movieRepository.GetById(movieId)).Returns(null);
-        var command = new PurchaseMovie.Command{CustomerEmail = _customer.Email, MovieId = movieId};
+        var command = new PurchaseMovie.Command{CustomerEmail = "email1@gmail.com", MovieId = movieId};
         
         var result = Act(command);
         

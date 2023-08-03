@@ -3,7 +3,7 @@ using FluentResults;
 using MediatR;
 using MovieStore.Core.Enum;
 using MovieStore.Core.Model;
-using MovieStoreApi.Handlers.Http;
+using MovieStore.Core.ValueObjects;
 using MovieStoreApi.Repositories.Interfaces;
 
 namespace MovieStoreApi.Handlers.Customers.Queries;
@@ -12,7 +12,7 @@ public static class GetCurrentCustomerRole
 {
     public class Query : IRequest<Result<Response>>
     {
-        public string Email { get; set; } = null!;
+        public string Email { get; set; } = string.Empty;
     }
     
     public class Response
@@ -33,12 +33,16 @@ public static class GetCurrentCustomerRole
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
-
-            var customer = _customerRepository.Search(x => x.Email == request.Email).FirstOrDefault();
-            if (customer != null) return HttpHandler.Ok(new Response { Role = customer.Role });
             
+            var emailResult = Email.Create(request.Email);
+            if (emailResult.IsFailed)
+                return HttpHandler.BadRequest<Response>();
+
+            var customer = _customerRepository.Search(x => x.Email == emailResult.Value).FirstOrDefault();
+            if (customer != null) return HttpHandler.Ok(new Response { Role = customer.Role });
+
             customer = new Customer
-                { Email = request.Email, Role = Role.Regular, Status = Status.Regular };
+                { Email = emailResult.Value, Role = Role.Regular, Status = Status.Regular };
             _customerRepository.Add(customer);
             _customerRepository.SaveChanges();
             return HttpHandler.Ok(new Response { Role = customer.Role });

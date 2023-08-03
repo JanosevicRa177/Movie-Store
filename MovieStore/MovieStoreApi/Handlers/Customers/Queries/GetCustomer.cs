@@ -1,8 +1,9 @@
-﻿using FluentResults;
+﻿using AutoMapper;
+using FluentResults;
+using JetBrains.Annotations;
 using MediatR;
 using MovieStore.Core.Enum;
 using MovieStore.Core.Model;
-using MovieStoreApi.Handlers.Http;
 using MovieStoreApi.Repositories.Interfaces;
 
 namespace MovieStoreApi.Handlers.Customers.Queries;
@@ -16,17 +17,26 @@ public static class GetCustomer
     public class Response
     {
         public Guid Id { get; set; }
-        public string Email { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty; 
         public Status Status { get; set; }
+    }
+    
+    [UsedImplicitly]
+    public class MappingProfile : Profile
+    {
+        public MappingProfile() => CreateMap<Customer, Response>()
+            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email.Value));
     }
     
     public class RequestHandler : IRequestHandler<Query, Result<Response>>
     {
         private readonly IRepository<Customer> _customerRepository;
+        private readonly IMapper _mapper;
 
-        public RequestHandler(IRepository<Customer> customerRepository)
+        public RequestHandler(IRepository<Customer> customerRepository, IMapper mapper)
         {
             _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
@@ -38,7 +48,10 @@ public static class GetCustomer
             if (customer == null) return HttpHandler.NotFound<Response>();
             
             customer.CalculateAdvanced();
-            return HttpHandler.Ok(new Response { Id = customer.Id, Email = customer.Email });
+            
+            var customersDto = _mapper.Map<Response>(customer);
+            
+            return HttpHandler.Ok(new Response { Id = customer.Id, Email = customer.Email.Value });
         }
     }
 }

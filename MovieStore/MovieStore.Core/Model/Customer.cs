@@ -1,18 +1,19 @@
 ﻿using MovieStore.Core.Enum;
+using MovieStore.Core.ValueObjects;
 
 namespace MovieStore.Core.Model;
 
 public class Customer
 {
     public Guid Id { get; set; }
-    public string Email { get; set; } = string.Empty;
+    public Email Email { get; set; } = null!;
     public Status Status { get; set; }
     public Role Role { get; set; }
     public DateTime? StatusExpirationDate { get; set; }
     public IList<PurchasedMovie> PurchasedMovies { get; set; } = new List<PurchasedMovie>();
     public double MoneySpent { get; set; }
 
-    public void Update(string email)
+    public void Update(Email email)
     {
         Email = email;
     }

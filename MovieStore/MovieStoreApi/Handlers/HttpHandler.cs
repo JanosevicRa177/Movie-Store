@@ -1,7 +1,7 @@
 ﻿using FluentResults;
 using MovieStoreApi.Errors;
 
-namespace MovieStoreApi.Handlers.Http;
+namespace MovieStoreApi.Handlers;
 
 public static class HttpHandler
 {

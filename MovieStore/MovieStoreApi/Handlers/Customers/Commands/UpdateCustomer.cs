@@ -1,7 +1,7 @@
 ﻿using FluentResults;
 using MediatR;
 using MovieStore.Core.Model;
-using MovieStoreApi.Handlers.Http;
+using MovieStore.Core.ValueObjects;
 using MovieStoreApi.Repositories.Interfaces;
 
 namespace MovieStoreApi.Handlers.Customers.Commands;
@@ -31,7 +31,11 @@ public static class UpdateCustomer
             if (customer == null)
                 return HttpHandler.NotFound();
             
-            customer.Update(request.Email);
+            var emailResult = Email.Create(request.Email);
+            if (emailResult.IsFailed)
+                return HttpHandler.BadRequest();
+
+            customer.Update(emailResult.Value);
             _customerRepository.SaveChanges();
             
             return  HttpHandler.Ok();

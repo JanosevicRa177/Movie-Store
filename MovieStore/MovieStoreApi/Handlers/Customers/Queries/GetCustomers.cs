@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using FluentResults;
+using JetBrains.Annotations;
 using MediatR;
 using MovieStore.Core.Enum;
 using MovieStore.Core.Model;
@@ -21,13 +22,22 @@ public static class GetCustomers
         public Status Status { get; set; }
     }
 
+    [UsedImplicitly]
+    public class MappingProfile : Profile
+    {
+        public MappingProfile() => CreateMap<Customer, Response>()
+            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email.Value));
+    }
+    
     public class RequestHandler : IRequestHandler<Query, Result<IEnumerable<Response>>>
     {
         private readonly IRepository<Customer> _customerRepository;
-
-        public RequestHandler(IRepository<Customer>customerRepository)
+        private readonly IMapper _mapper;
+        
+        public RequestHandler(IRepository<Customer>customerRepository, IMapper mapper)
         {
             _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         public Task<Result<IEnumerable<Response>>> Handle(Query request, CancellationToken cancellationToken)
@@ -38,9 +48,7 @@ public static class GetCustomers
             var customers = _customerRepository.GetAll();
             foreach (var customer in customers) customer.CalculateAdvanced();
 
-            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<Customer, Response>());
-            var mapper = new Mapper(mapperConfig);
-            var customersDto = mapper.Map<IEnumerable<Response>>(customers);
+            var customersDto = _mapper.Map<IEnumerable<Response>>(customers);
             
             return Task.FromResult(Result.Ok(customersDto));
         }

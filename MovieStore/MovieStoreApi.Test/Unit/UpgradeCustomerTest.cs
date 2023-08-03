@@ -4,6 +4,7 @@ using FluentResults;
 using Microsoft.AspNetCore.Http;
 using MovieStore.Core.Enum;
 using MovieStore.Core.Model;
+using MovieStore.Core.ValueObjects;
 using MovieStoreApi.Handlers.Customers.Commands;
 using MovieStoreApi.Repositories.Interfaces;
 using MovieStoreApi.Test.Extensions;
@@ -22,7 +23,7 @@ public class UpgradeCustomerTest
     {
         _customerRepository = A.Fake<IRepository<Customer>>();
         _handler = new UpgradeCustomer.RequestHandler(_customerRepository);
-        _regularCustomer = new Customer {Email = "regular@gmail.com",Id = Guid.NewGuid(),Status = Status.Regular, MoneySpent = 1300}; 
+        _regularCustomer = new Customer {Email = Email.Create("regular@gmail.com").Value,Id = Guid.NewGuid(),Status = Status.Regular, MoneySpent = 1300}; 
     }
 
     [Test]
@@ -102,5 +103,5 @@ public class UpgradeCustomerTest
         A.CallTo(() => customerRepository.GetById(customer.Id)).Returns(customer);
     private Result Act(UpgradeCustomer.Command command) => _handler.Handle(command, new CancellationToken()).Result;
     private static Customer CreateAdvancedCustomerWithExpirationDay(int day) => 
-        new Customer {Email = "regular@gmail.com",Id = Guid.NewGuid(),Status = Status.Advanced,StatusExpirationDate = DateTime.Now.AddDays(day)};
+        new Customer {Email = Email.Create("advanced@gmail.com").Value,Id = Guid.NewGuid(),Status = Status.Advanced,StatusExpirationDate = DateTime.Now.AddDays(day)};
 }

@@ -17,6 +17,8 @@ public class CustomerRepository :GenericRepository<Customer>
     }
     
     public override IEnumerable<Customer> Search(Expression<Func<Customer,bool>> predicate) {
-        return Context.Set<Customer>().Include(customer =>customer.PurchasedMovies).ThenInclude(movie => movie.Movie).Where(predicate);
+        return Context.Set<Customer>()
+            .Include(customer =>customer.PurchasedMovies)
+            .ThenInclude(movie => movie.Movie).Where(predicate);
     }
 }

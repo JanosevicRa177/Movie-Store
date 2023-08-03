@@ -815,7 +815,7 @@ export class MovieClient implements IMovieClient {
 
 export class GetCustomerResponse implements IGetCustomerResponse {
     id?: string;
-    email?: string;
+    email?: Email;
     status?: Status;
 
     constructor(data?: IGetCustomerResponse) {
@@ -830,7 +830,7 @@ export class GetCustomerResponse implements IGetCustomerResponse {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
-            this.email = _data["email"];
+            this.email = _data["email"] ? Email.fromJS(_data["email"]) : <any>undefined;
             this.status = _data["status"];
         }
     }
@@ -845,7 +845,7 @@ export class GetCustomerResponse implements IGetCustomerResponse {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
-        data["email"] = this.email;
+        data["email"] = this.email ? this.email.toJSON() : <any>undefined;
         data["status"] = this.status;
         return data;
     }
@@ -853,8 +853,69 @@ export class GetCustomerResponse implements IGetCustomerResponse {
 
 export interface IGetCustomerResponse {
     id?: string;
-    email?: string;
+    email?: Email;
     status?: Status;
+}
+
+export abstract class RecordWithValidation implements IRecordWithValidation {
+
+    constructor(data?: IRecordWithValidation) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+    }
+
+    static fromJS(data: any): RecordWithValidation {
+        data = typeof data === 'object' ? data : {};
+        throw new Error("The abstract class 'RecordWithValidation' cannot be instantiated.");
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        return data;
+    }
+}
+
+export interface IRecordWithValidation {
+}
+
+export class Email extends RecordWithValidation implements IEmail {
+    value?: string;
+
+    constructor(data?: IEmail) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.value = _data["value"];
+        }
+    }
+
+    static override fromJS(data: any): Email {
+        data = typeof data === 'object' ? data : {};
+        let result = new Email();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["value"] = this.value;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+export interface IEmail extends IRecordWithValidation {
+    value?: string;
 }
 
 export enum Status {

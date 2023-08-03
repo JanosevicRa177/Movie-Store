@@ -2,7 +2,7 @@
 using MediatR;
 using MovieStore.Core.Enum;
 using MovieStore.Core.Model;
-using MovieStoreApi.Handlers.Http;
+using MovieStore.Core.ValueObjects;
 using MovieStoreApi.Repositories.Interfaces;
 
 namespace MovieStoreApi.Handlers.Customers.Commands;
@@ -26,8 +26,13 @@ public static class AddCustomer
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
+
+            var emailResult = Email.Create(request.Email);
+            if (emailResult.IsFailed)
+                return HttpHandler.BadRequest();
+            
             var customer = new Customer
-                { Email = request.Email, Role = Role.Regular, Status = Status.Regular };
+                { Email = emailResult.Value, Role = Role.Regular, Status = Status.Regular };
             _customerRepository.Add(customer);
             _customerRepository.SaveChanges();
 

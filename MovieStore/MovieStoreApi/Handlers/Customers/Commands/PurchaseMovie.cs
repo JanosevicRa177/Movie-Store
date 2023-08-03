@@ -1,7 +1,7 @@
 ﻿using FluentResults;
 using MediatR;
 using MovieStore.Core.Model;
-using MovieStoreApi.Handlers.Http;
+using MovieStore.Core.ValueObjects;
 using MovieStoreApi.Repositories.Interfaces;
 
 namespace MovieStoreApi.Handlers.Customers.Commands;
@@ -29,8 +29,12 @@ public static class PurchaseMovie
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
+            
+            var emailResult = Email.Create(request.CustomerEmail);
+            if (emailResult.IsFailed)
+                return HttpHandler.BadRequest();
 
-            var customer = _customerRepository.Search(x => x.Email == request.CustomerEmail).FirstOrDefault();
+            var customer = _customerRepository.Search(x => x.Email == emailResult.Value).FirstOrDefault();
             if (customer == null) return HttpHandler.NotFound();
             
             var movie = _movieRepository.GetById(request.MovieId);
