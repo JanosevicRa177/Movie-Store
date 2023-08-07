@@ -11,7 +11,7 @@ public abstract class UpdateMovie
     public class Command : IRequest<Result>
     {
         public Guid Id { get; set; }
-        public string Name { get; set; } = null!;
+        public string Name { get; set; } = string.Empty;
         public LicensingType LicensingType { get; set; }
     }
 

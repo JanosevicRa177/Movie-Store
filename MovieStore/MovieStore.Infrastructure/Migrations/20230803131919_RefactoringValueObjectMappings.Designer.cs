@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MovieStore.Infrastructure;
 
@@ -11,9 +12,11 @@ using MovieStore.Infrastructure;
 namespace MovieStore.Infrastructure.Migrations
 {
     [DbContext(typeof(MovieStoreContext))]
-    partial class MovieStoreContextModelSnapshot : ModelSnapshot
+    [Migration("20230803131919_RefactoringValueObjectMappings")]
+    partial class RefactoringValueObjectMappings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,8 +35,8 @@ namespace MovieStore.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("MoneySpent")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("MoneySpent")
+                        .HasColumnType("float");
 
                     b.Property<int>("Role")
                         .HasColumnType("int");
@@ -111,7 +114,7 @@ namespace MovieStore.Infrastructure.Migrations
                                     b2.Property<Guid>("CustomerStatusCustomerId")
                                         .HasColumnType("uniqueidentifier");
 
-                                    b2.Property<DateTime>("Date")
+                                    b2.Property<DateTime?>("Date")
                                         .HasColumnType("datetime2")
                                         .HasColumnName("StatusExpirationDate");
 

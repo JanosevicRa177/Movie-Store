@@ -12,9 +12,24 @@ public class CustomerConfiguration: IEntityTypeConfiguration<Customer>
         builder
             .HasMany(customer => customer.PurchasedMovies)
             .WithOne(purchasedMovie => purchasedMovie.Customer);
+        
         builder
             .Property(customer => customer.Email)
             .HasConversion(email => email.Value,
                 emailString => Email.Create(emailString).Value);
+
+        builder.OwnsOne(x => x.CustomerStatus, customerStatus =>
+        {
+            customerStatus.Property(x => x.Status)
+                .HasColumnName("Status");
+
+            customerStatus.OwnsOne(cs => cs.ExpirationDate)
+                .Property(p => p.Date)
+                .HasColumnName("StatusExpirationDate");
+        });
+        
+        builder.Property(customer => customer.MoneySpent)
+            .HasConversion(moneySpent => moneySpent.Amount,
+                money => Money.Create(money).Value);
     }
 }

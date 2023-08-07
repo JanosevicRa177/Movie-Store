@@ -67,7 +67,6 @@ public class CustomerController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Administrator")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -113,7 +112,7 @@ public class CustomerController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpgradeCustomer(Guid id)
     {
-        var response = await _mediator.Send(new UpgradeCustomer.Command { Id = id });
+        var response = await _mediator.Send(new PromoteCustomer.Command { Id = id });
         return response.ToActionResult();
     }
     

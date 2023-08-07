@@ -30,9 +30,9 @@ public static class AddCustomer
             var emailResult = Email.Create(request.Email);
             if (emailResult.IsFailed)
                 return HttpHandler.BadRequest();
-            
-            var customer = new Customer
-                { Email = emailResult.Value, Role = Role.Regular, Status = Status.Regular };
+
+            var customer = new Customer(emailResult.Value);
+
             _customerRepository.Add(customer);
             _customerRepository.SaveChanges();
 

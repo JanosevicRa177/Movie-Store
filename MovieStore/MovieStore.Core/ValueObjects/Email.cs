@@ -7,8 +7,6 @@ public record Email
 {
     public string Value = string.Empty;
 
-    private Email(){}
-    
     private Email(string value)
     {
         Value = value;

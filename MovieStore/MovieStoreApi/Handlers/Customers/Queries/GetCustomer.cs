@@ -25,7 +25,8 @@ public static class GetCustomer
     public class MappingProfile : Profile
     {
         public MappingProfile() => CreateMap<Customer, Response>()
-            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email.Value));
+            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email.Value))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.CustomerStatus.Status));
     }
     
     public class RequestHandler : IRequestHandler<Query, Result<Response>>
@@ -46,9 +47,7 @@ public static class GetCustomer
 
             var customer = _customerRepository.GetById(request.Id);
             if (customer == null) return HttpHandler.NotFound<Response>();
-            
-            customer.CalculateAdvanced();
-            
+
             var customersDto = _mapper.Map<Response>(customer);
             
             return HttpHandler.Ok(new Response { Id = customer.Id, Email = customer.Email.Value });

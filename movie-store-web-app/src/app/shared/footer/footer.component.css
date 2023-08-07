@@ -1,7 +1,6 @@
 .footer-content {
   display: flex;
   align-items: center;
-  margin-top: 16px;
   font-size: x-large;
 }
 .footer-container {
@@ -14,4 +13,5 @@
   color: #70f4ac;
   display: flex;
   justify-content: center;
+  min-height: 100%;
 }

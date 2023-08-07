@@ -37,12 +37,15 @@ public static class GetCurrentCustomerRole
             var emailResult = Email.Create(request.Email);
             if (emailResult.IsFailed)
                 return HttpHandler.BadRequest<Response>();
+            
+            var moneyResult = Money.Create(0);
+            if (moneyResult.IsFailed)
+                return HttpHandler.BadRequest<Response>();
 
             var customer = _customerRepository.Search(x => x.Email == emailResult.Value).FirstOrDefault();
             if (customer != null) return HttpHandler.Ok(new Response { Role = customer.Role });
 
-            customer = new Customer
-                { Email = emailResult.Value, Role = Role.Regular, Status = Status.Regular };
+            customer = new Customer(emailResult.Value);
             _customerRepository.Add(customer);
             _customerRepository.SaveChanges();
             return HttpHandler.Ok(new Response { Role = customer.Role });

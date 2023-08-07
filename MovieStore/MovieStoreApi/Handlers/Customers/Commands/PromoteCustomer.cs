@@ -7,7 +7,7 @@ using MovieStoreApi.Repositories.Interfaces;
 
 namespace MovieStoreApi.Handlers.Customers.Commands;
 
-public static class UpgradeCustomer
+public static class PromoteCustomer
 {
     public class Command : IRequest<Result> 
     {
@@ -32,10 +32,8 @@ public static class UpgradeCustomer
             if (customer == null)
                 return HttpHandler.NotFound();
 
-            if (!customer.CanUpgrade())
-                return  HttpHandler.BadRequest();
-            
-            customer.Upgrade();
+            var result = customer.Promote();
+            if(result.IsFailed)  return HttpHandler.BadRequest();
             _customerRepository.SaveChanges();
 
             return HttpHandler.Ok();

@@ -26,7 +26,8 @@ public static class GetCustomers
     public class MappingProfile : Profile
     {
         public MappingProfile() => CreateMap<Customer, Response>()
-            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email.Value));
+            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email.Value))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.CustomerStatus.Status));
     }
     
     public class RequestHandler : IRequestHandler<Query, Result<IEnumerable<Response>>>
@@ -46,7 +47,6 @@ public static class GetCustomers
                 throw new ArgumentNullException(nameof(request));
 
             var customers = _customerRepository.GetAll();
-            foreach (var customer in customers) customer.CalculateAdvanced();
 
             var customersDto = _mapper.Map<IEnumerable<Response>>(customers);
             

@@ -1,4 +1,5 @@
-﻿using FakeItEasy;
+﻿using System.Linq.Expressions;
+using FakeItEasy;
 using FluentAssertions;
 using FluentResults;
 using Microsoft.AspNetCore.Http;
@@ -26,8 +27,8 @@ public class PurchaseMovieTest
         _movieRepository = A.Fake<IRepository<Movie>>();
         _handler = new PurchaseMovie.RequestHandler(_customerRepository, _movieRepository);
 
-        _customer = new Customer {Email = Email.Create( "email1@gmail.com").Value,Id = Guid.NewGuid(),Status = Status.Regular};
-        MockGetById(_customerRepository, _customer);
+        _customer = new Customer {Email = Email.Create( "email1@gmail.com").Value,Id = Guid.NewGuid(),CustomerStatus = new CustomerStatus(ExpirationDate.Infinite, Status.Regular)};
+        MockGetByEmail(_customerRepository, _customer);
     }
 
     [Test]
@@ -47,7 +48,7 @@ public class PurchaseMovieTest
     {
         var movie = new Movie { Id = Guid.NewGuid(), Name = "Insidious", LicensingType = LicensingType.TwoDay };
         MockGetById(_movieRepository, movie);
-        var purchasedMovie = new PurchasedMovie {ExpirationDate = DateTime.Now.AddDays(-1),Customer = _customer,Movie = movie};
+        var purchasedMovie = new PurchasedMovie {ExpirationDate = new ExpirationDate(DateTime.Now.AddDays(-1)),Customer = _customer,Movie = movie};
         _customer.PurchasedMovies.Add(purchasedMovie);
         var command = new PurchaseMovie.Command{CustomerEmail = "email1@gmail.com", MovieId = movie.Id};
         
@@ -61,7 +62,7 @@ public class PurchaseMovieTest
     {
         var movie = new Movie { Id = Guid.NewGuid(), Name = "Insidious", LicensingType = LicensingType.TwoDay };
         MockGetById(_movieRepository, movie);
-        var purchasedMovie = new PurchasedMovie {ExpirationDate = DateTime.Now.AddDays(1),Customer = _customer,Movie = movie};
+        var purchasedMovie = new PurchasedMovie {ExpirationDate = new ExpirationDate(DateTime.Now.AddDays(1)),Customer = _customer,Movie = movie};
         _customer.PurchasedMovies.Add(purchasedMovie);
         var command = new PurchaseMovie.Command{CustomerEmail = "email1@gmail.com", MovieId = movie.Id};
         
@@ -97,11 +98,11 @@ public class PurchaseMovieTest
     [Test]
     public void Customer_Does_Not_Exists_Fail()
     {
-        var email = "something@gmail.com";
-        A.CallTo(() => _customerRepository.GetById(new Guid())).Returns(null);
+        var email = Email.Create("something@gmail.com").Value;
+        A.CallTo(() => _customerRepository.Search(x => x.Email == email))!.Returns(Enumerable.Empty<Customer>());
         var movie = new Movie { Id = Guid.NewGuid(), Name = "Insidious", LicensingType = LicensingType.Lifelong };
         MockGetById(_movieRepository, movie);
-        var command = new PurchaseMovie.Command{CustomerEmail = email, MovieId = movie.Id};
+        var command = new PurchaseMovie.Command{CustomerEmail = email.Value, MovieId = movie.Id};
         
         var result = Act(command);
         
@@ -113,6 +114,10 @@ public class PurchaseMovieTest
     private static void MockGetById(IRepository<Movie> movieRepository,Movie movie1) => 
         A.CallTo(() => movieRepository.GetById(movie1.Id)).Returns(movie1);
 
-    private static void MockGetById(IRepository<Customer> customerRepository,Customer customer) => 
-        A.CallTo(() => customerRepository.GetById(customer.Id)).Returns(customer);
+    private static void MockGetByEmail(IRepository<Customer> customerRepository, Customer customer)
+    {
+        var customers = new List<Customer> { customer };
+        A.CallTo(() => customerRepository.Search(A<Expression<Func<Customer, bool>>>._))
+            .Returns(customers);
+    }
 }

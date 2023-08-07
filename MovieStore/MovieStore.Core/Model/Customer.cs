@@ -1,58 +1,67 @@
-﻿using MovieStore.Core.Enum;
+﻿using FluentResults;
+using Microsoft.EntityFrameworkCore;
+using MovieStore.Core.Enum;
 using MovieStore.Core.ValueObjects;
 
 namespace MovieStore.Core.Model;
 
 public class Customer
 {
-    public Guid Id { get; set; }
-    public Email Email { get; set; } = null!;
-    public Status Status { get; set; }
-    public Role Role { get; set; }
-    public DateTime? StatusExpirationDate { get; set; }
-    public IList<PurchasedMovie> PurchasedMovies { get; set; } = new List<PurchasedMovie>();
-    public double MoneySpent { get; set; }
+    public Guid Id { get; private set; }
+    public Email Email { get; private set; } = null!;
+    public CustomerStatus CustomerStatus { get; private set; } = null!;
+    public Role Role { get; private set; }
+    public Money MoneySpent { get; private set; } = null!;
+    private List<PurchasedMovie> _purchasedMovies { get; } = new List<PurchasedMovie>();
+    public IReadOnlyList<PurchasedMovie> PurchasedMovies => _purchasedMovies;
 
+    public Customer()
+    {
+    }
+
+    public Customer(Email email)
+    {
+        Email = email;
+        CustomerStatus = new CustomerStatus(ExpirationDate.Infinite, Status.Regular);
+        Role = Role.Regular;
+        MoneySpent = Money.Create(0).Value;
+    }
+    
     public void Update(Email email)
     {
         Email = email;
     }
-    public void Upgrade()
+    
+    private bool CanPromote() => 
+        !CustomerStatus.IsAdvanced() && HasEnoughMoviesInRecentTime() && MoneySpent.Has(1200);
+    
+    public Result Promote()
     {
-        Status = Status.Advanced;
-        StatusExpirationDate = DateTime.Now.AddYears(1);
+        if (!CanPromote()) return Result.Fail("Customer can't promote!");
+        CustomerStatus = new CustomerStatus(new ExpirationDate(DateTime.Now.AddYears(1)), Status.Advanced);
+        return Result.Ok();
     }
     
-    public bool Has(Movie movie) =>
-        PurchasedMovies.Any(pm =>
-            pm.Movie == movie&& (pm.ExpirationDate > DateTime.Now || pm.ExpirationDate == null));
+    private bool Has(Movie movie) =>
+        _purchasedMovies.Any(pm =>
+            pm.Movie == movie && !(pm.ExpirationDate.IsExpired()));
 
-    public void CalculateAdvanced() => 
-        Status = IsAdvanced() ? Status.Advanced : Status.Regular;
-
-    public bool CanUpgrade() => 
-        !IsAdvanced() && HasEnoughMoviesInRecentTime() && MoneySpent > 1200;
-    
-    public void PurchaseMovie(Movie movie)
+    public Result PurchaseMovie(Movie movie)
     {
-        double price = movie.LicensingType switch
-        {
-            LicensingType.Lifelong => 700,
-            LicensingType.TwoDay => 300,
-            _ => throw new InvalidOperationException()
-        };
-        if (this.IsAdvanced())
-            price *=  0.8;
-        MoneySpent += price;
-        var purchasedMovie = new PurchasedMovie{Customer = this, Movie = movie,
-            PurchaseDate = DateTime.Now, ExpirationDate = movie.LicensingType == LicensingType.TwoDay ? DateTime.Now.AddDays(2): null};
-        PurchasedMovies.Add(purchasedMovie);
+        if(Has(movie)) return Result.Fail("Customer has this movie!");
+        var price = movie.LicensingType.GetPrice() * CustomerStatus.Status.GetDiscount();
+        
+        var priceResult = Money.Create(price);
+        if (priceResult.IsFailed) return Result.Fail("Error creating money spent!");
+
+        var purchasedMovie = new PurchasedMovie(movie, this);
+        _purchasedMovies.Add(purchasedMovie);
+        MoneySpent += priceResult.Value;
+        return Result.Ok();
     }
 
     private bool HasEnoughMoviesInRecentTime()
     {
-        return PurchasedMovies.Where(movie => movie.PurchaseDate > DateTime.Now.AddMonths(-2)).ToList().Count > 2;
+        return _purchasedMovies.Where(movie => movie.PurchaseDate > DateTime.Now.AddMonths(-2)).ToList().Count > 2;
     }
-
-    private bool IsAdvanced() => Status == Status.Advanced && StatusExpirationDate > DateTime.Now;
 }

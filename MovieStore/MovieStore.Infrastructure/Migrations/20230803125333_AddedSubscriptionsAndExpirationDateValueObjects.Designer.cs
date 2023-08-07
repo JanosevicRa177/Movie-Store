@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MovieStore.Infrastructure;
 
@@ -11,9 +12,11 @@ using MovieStore.Infrastructure;
 namespace MovieStore.Infrastructure.Migrations
 {
     [DbContext(typeof(MovieStoreContext))]
-    partial class MovieStoreContextModelSnapshot : ModelSnapshot
+    [Migration("20230803125333_AddedSubscriptionsAndExpirationDateValueObjects")]
+    partial class AddedSubscriptionsAndExpirationDateValueObjects
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,11 +35,15 @@ namespace MovieStore.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("MoneySpent")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("MoneySpent")
+                        .HasColumnType("float");
 
                     b.Property<int>("Role")
                         .HasColumnType("int");
+
+                    b.Property<string>("Subscription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -70,14 +77,12 @@ namespace MovieStore.Infrastructure.Migrations
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("ExpirationDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<Guid>("MovieId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("PurchaseDate")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("MovieSubscription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -86,49 +91,6 @@ namespace MovieStore.Infrastructure.Migrations
                     b.HasIndex("MovieId");
 
                     b.ToTable("PurchasedMovies");
-                });
-
-            modelBuilder.Entity("MovieStore.Core.Model.Customer", b =>
-                {
-                    b.OwnsOne("MovieStore.Core.ValueObjects.CustomerStatus", "CustomerStatus", b1 =>
-                        {
-                            b1.Property<Guid>("CustomerId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<int>("Status")
-                                .HasColumnType("int")
-                                .HasColumnName("Status");
-
-                            b1.HasKey("CustomerId");
-
-                            b1.ToTable("Customers");
-
-                            b1.WithOwner()
-                                .HasForeignKey("CustomerId");
-
-                            b1.OwnsOne("MovieStore.Core.ValueObjects.ExpirationDate", "ExpirationDate", b2 =>
-                                {
-                                    b2.Property<Guid>("CustomerStatusCustomerId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<DateTime>("Date")
-                                        .HasColumnType("datetime2")
-                                        .HasColumnName("StatusExpirationDate");
-
-                                    b2.HasKey("CustomerStatusCustomerId");
-
-                                    b2.ToTable("Customers");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("CustomerStatusCustomerId");
-                                });
-
-                            b1.Navigation("ExpirationDate")
-                                .IsRequired();
-                        });
-
-                    b.Navigation("CustomerStatus")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("MovieStore.Core.Model.PurchasedMovie", b =>

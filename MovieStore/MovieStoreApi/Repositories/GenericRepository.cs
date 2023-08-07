@@ -1,5 +1,4 @@
 ﻿using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore;
 using MovieStore.Infrastructure;
 using MovieStoreApi.Repositories.Interfaces;
 
@@ -37,6 +36,7 @@ public abstract class GenericRepository<T>:IRepository<T> where T : class
 
     public void SaveChanges()
     {
+        bool hasChanges = Context.ChangeTracker.HasChanges(); 
         Context.SaveChanges();
     }
     public virtual IEnumerable<T> Search(Expression<Func<T,bool>> predicate) {

@@ -40,9 +40,8 @@ public static class PurchaseMovie
             var movie = _movieRepository.GetById(request.MovieId);
             if (movie == null) return HttpHandler.NotFound();
 
-            if (customer.Has(movie)) return HttpHandler.BadRequest();
-            
-            customer.PurchaseMovie(movie);
+            var result = customer.PurchaseMovie(movie);
+            if (result.IsFailed) return HttpHandler.BadRequest();
             _customerRepository.SaveChanges();
             
             return HttpHandler.Ok();

@@ -27,7 +27,7 @@ public static class AddMovie
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
 
-            _movieRepository.Add(new Movie{Name = request.Name,LicensingType = request.LicensingType});
+            _movieRepository.Add(new Movie(request.Name,request.LicensingType));
             _movieRepository.SaveChanges();
             
             return HttpHandler.Ok();

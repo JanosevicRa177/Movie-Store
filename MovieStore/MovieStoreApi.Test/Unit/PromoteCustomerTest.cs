@@ -1,4 +1,5 @@
-﻿using FakeItEasy;
+﻿using System.Linq.Expressions;
+using FakeItEasy;
 using FluentAssertions;
 using FluentResults;
 using Microsoft.AspNetCore.Http;
@@ -12,29 +13,34 @@ using MovieStoreApi.Test.Extensions;
 namespace MovieStoreApi.Test.Unit;
 
 [TestFixture]
-public class UpgradeCustomerTest
+public class PromoteCustomerTest
 {
     private IRepository<Customer> _customerRepository = null!;
-    private UpgradeCustomer.RequestHandler _handler = null!;
-    private Customer _regularCustomer = null!;
+    private PromoteCustomer.RequestHandler _handler = null!;
+
+    private static Customer RegularCustomer => new Customer
+    {
+        Email = Email.Create("regular@gmail.com").Value, Id = Guid.NewGuid(),
+        CustomerStatus = new CustomerStatus(ExpirationDate.Infinite, Status.Regular),
+        MoneySpent = Money.Create(1300M).Value
+    };
 
     [SetUp]
     public void Setup()
     {
         _customerRepository = A.Fake<IRepository<Customer>>();
-        _handler = new UpgradeCustomer.RequestHandler(_customerRepository);
-        _regularCustomer = new Customer {Email = Email.Create("regular@gmail.com").Value,Id = Guid.NewGuid(),Status = Status.Regular, MoneySpent = 1300}; 
+        _handler = new PromoteCustomer.RequestHandler(_customerRepository);
     }
 
     [Test]
     public void Upgrade_Success()
     {
-        MockGetById(_customerRepository, _regularCustomer);
+        MockGetById(_customerRepository, RegularCustomer);
         var lifelongMovie = new Movie { LicensingType = LicensingType.Lifelong,Id = Guid.NewGuid()};
-        _regularCustomer.PurchasedMovies.Add(new PurchasedMovie{Movie = lifelongMovie, PurchaseDate = DateTime.Now.AddMonths(-1)});
-        _regularCustomer.PurchasedMovies.Add(new PurchasedMovie{Movie = lifelongMovie, PurchaseDate = DateTime.Now.AddMonths(-1)});
-        _regularCustomer.PurchasedMovies.Add(new PurchasedMovie{Movie = lifelongMovie, PurchaseDate = DateTime.Now.AddMonths(-1)});
-        var command = new UpgradeCustomer.Command{Id = _regularCustomer.Id};
+        RegularCustomer.PurchasedMovies.Add(new PurchasedMovie{Movie = lifelongMovie, PurchaseDate = DateTime.Now.AddMonths(-1)});
+        RegularCustomer.PurchasedMovies.Add(new PurchasedMovie{Movie = lifelongMovie, PurchaseDate = DateTime.Now.AddMonths(-1)});
+        RegularCustomer.PurchasedMovies.Add(new PurchasedMovie{Movie = lifelongMovie, PurchaseDate = DateTime.Now.AddMonths(-1)});
+        var command = new PromoteCustomer.Command{Id = RegularCustomer.Id};
         
         var result = Act(command);
         
@@ -44,8 +50,8 @@ public class UpgradeCustomerTest
     [Test]
     public void Upgrade_Regular_Fail()
     {
-        MockGetById(_customerRepository, _regularCustomer);
-        var command = new UpgradeCustomer.Command{Id = _regularCustomer.Id};
+        MockGetById(_customerRepository, RegularCustomer);
+        var command = new PromoteCustomer.Command{Id = RegularCustomer.Id};
         
         var result = Act(command);
         
@@ -57,7 +63,7 @@ public class UpgradeCustomerTest
     {
         var advancedCustomer = CreateAdvancedCustomerWithExpirationDay(-7); 
         MockGetById(_customerRepository, advancedCustomer);
-        var command = new UpgradeCustomer.Command{Id = advancedCustomer.Id};
+        var command = new PromoteCustomer.Command{Id = advancedCustomer.Id};
         
         var result = Act(command);
         
@@ -74,7 +80,7 @@ public class UpgradeCustomerTest
         advancedCustomer.PurchasedMovies.Add(new PurchasedMovie{Movie = lifelongMovie, PurchaseDate = DateTime.Now.AddMonths(-1)});
         advancedCustomer.PurchasedMovies.Add(new PurchasedMovie{Movie = lifelongMovie, PurchaseDate = DateTime.Now.AddMonths(-1)});
         
-        var command = new UpgradeCustomer.Command{Id = advancedCustomer.Id};
+        var command = new PromoteCustomer.Command{Id = advancedCustomer.Id};
         
         var result = Act(command);
         
@@ -92,16 +98,17 @@ public class UpgradeCustomerTest
         advancedCustomer.PurchasedMovies.Add(new PurchasedMovie{Movie = twoDayMovie, PurchaseDate = DateTime.Now.AddMonths(-3)});
         advancedCustomer.PurchasedMovies.Add(new PurchasedMovie{Movie = twoDayMovie, PurchaseDate = DateTime.Now.AddMonths(-3)});
         
-        var command = new UpgradeCustomer.Command{Id = advancedCustomer.Id};
+        var command = new PromoteCustomer.Command{Id = advancedCustomer.Id};
         
         var result = Act(command);
         
         result.ErrorShouldHave(StatusCodes.Status400BadRequest);
     }
 
-    private static void MockGetById(IRepository<Customer> customerRepository, Customer customer) =>
+    private Result Act(PromoteCustomer.Command command) => _handler.Handle(command, new CancellationToken()).Result;
+    
+    private static void MockGetById(IRepository<Customer> customerRepository,Customer customer) => 
         A.CallTo(() => customerRepository.GetById(customer.Id)).Returns(customer);
-    private Result Act(UpgradeCustomer.Command command) => _handler.Handle(command, new CancellationToken()).Result;
-    private static Customer CreateAdvancedCustomerWithExpirationDay(int day) => 
-        new Customer {Email = Email.Create("advanced@gmail.com").Value,Id = Guid.NewGuid(),Status = Status.Advanced,StatusExpirationDate = DateTime.Now.AddDays(day)};
+    private static Customer CreateAdvancedCustomerWithExpirationDay(int day) {}
+        new Customer {Email = Email.Create("advanced@gmail.com").Value,Id = Guid.NewGuid(),CustomerStatus = new CustomerStatus(new ExpirationDate(DateTime.Now.AddDays(day)),Status.Advanced)};
 }
