@@ -20,8 +20,7 @@ export interface ICustomerClient {
     delete(id: string): Observable<void>;
     update(id: string, customerDto: CustomerDto): Observable<void>;
     getAll(): Observable<GetCustomersResponse[]>;
-    add(customerDto: CustomerDto): Observable<void>;
-    getCurrentCustomerRole(): Observable<GetCurrentCustomerRoleResponse>;
+    getOrAddCustomer(): Observable<AddCustomerAndGetRoleBackResponse>;
     purchaseMovie(movieId: string): Observable<void>;
     upgradeCustomer(id: string): Observable<void>;
 }
@@ -285,55 +284,7 @@ export class CustomerClient implements ICustomerClient {
         return _observableOf(null as any);
     }
 
-    add(customerDto: CustomerDto): Observable<void> {
-        let url_ = this.baseUrl + "/customer";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(customerDto);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json",
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processAdd(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processAdd(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<void>;
-        }));
-    }
-
-    protected processAdd(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 201) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    getCurrentCustomerRole(): Observable<GetCurrentCustomerRoleResponse> {
+    getOrAddCustomer(): Observable<AddCustomerAndGetRoleBackResponse> {
         let url_ = this.baseUrl + "/customer/current";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -345,21 +296,21 @@ export class CustomerClient implements ICustomerClient {
             })
         };
 
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetCurrentCustomerRole(response_);
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetOrAddCustomer(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGetCurrentCustomerRole(response_ as any);
+                    return this.processGetOrAddCustomer(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<GetCurrentCustomerRoleResponse>;
+                    return _observableThrow(e) as any as Observable<AddCustomerAndGetRoleBackResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<GetCurrentCustomerRoleResponse>;
+                return _observableThrow(response_) as any as Observable<AddCustomerAndGetRoleBackResponse>;
         }));
     }
 
-    protected processGetCurrentCustomerRole(response: HttpResponseBase): Observable<GetCurrentCustomerRoleResponse> {
+    protected processGetOrAddCustomer(response: HttpResponseBase): Observable<AddCustomerAndGetRoleBackResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -370,7 +321,7 @@ export class CustomerClient implements ICustomerClient {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = GetCurrentCustomerRoleResponse.fromJS(resultData200);
+            result200 = AddCustomerAndGetRoleBackResponse.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status === 404) {
@@ -970,6 +921,47 @@ export interface IGetCustomersResponse {
     status?: Status;
 }
 
+export class AddCustomerAndGetRoleBackResponse implements IAddCustomerAndGetRoleBackResponse {
+    role!: Role;
+
+    constructor(data?: IAddCustomerAndGetRoleBackResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.role = _data["role"];
+        }
+    }
+
+    static fromJS(data: any): AddCustomerAndGetRoleBackResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AddCustomerAndGetRoleBackResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["role"] = this.role;
+        return data;
+    }
+}
+
+export interface IAddCustomerAndGetRoleBackResponse {
+    role: Role;
+}
+
+export enum Role {
+    Regular = 0,
+    Administrator = 1,
+}
+
 export class CustomerDto implements ICustomerDto {
     email?: string;
 
@@ -1004,47 +996,6 @@ export class CustomerDto implements ICustomerDto {
 
 export interface ICustomerDto {
     email?: string;
-}
-
-export class GetCurrentCustomerRoleResponse implements IGetCurrentCustomerRoleResponse {
-    role!: Role;
-
-    constructor(data?: IGetCurrentCustomerRoleResponse) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.role = _data["role"];
-        }
-    }
-
-    static fromJS(data: any): GetCurrentCustomerRoleResponse {
-        data = typeof data === 'object' ? data : {};
-        let result = new GetCurrentCustomerRoleResponse();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["role"] = this.role;
-        return data;
-    }
-}
-
-export interface IGetCurrentCustomerRoleResponse {
-    role: Role;
-}
-
-export enum Role {
-    Regular = 0,
-    Administrator = 1,
 }
 
 export class GetMovieResponse implements IGetMovieResponse {

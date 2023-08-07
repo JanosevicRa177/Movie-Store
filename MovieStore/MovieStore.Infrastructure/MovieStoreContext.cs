@@ -10,7 +10,7 @@ public class MovieStoreContext: DbContext
     {
     }
 
-    public DbSet<Customer> Customers { get; set; } = null!;
+    public DbSet<Customer> Customers { get; set; } = null!;     
     public DbSet<Movie> Movies { get; set; } = null!;
     public DbSet<PurchasedMovie> PurchasedMovies { get; set; } = null!;
 

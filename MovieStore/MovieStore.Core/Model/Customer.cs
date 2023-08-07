@@ -1,5 +1,4 @@
 ﻿using FluentResults;
-using Microsoft.EntityFrameworkCore;
 using MovieStore.Core.Enum;
 using MovieStore.Core.ValueObjects;
 
@@ -41,15 +40,12 @@ public class Customer
         CustomerStatus = new CustomerStatus(new ExpirationDate(DateTime.Now.AddYears(1)), Status.Advanced);
         return Result.Ok();
     }
-    
-    private bool Has(Movie movie) =>
-        _purchasedMovies.Any(pm =>
-            pm.Movie == movie && !(pm.ExpirationDate.IsExpired()));
 
     public Result PurchaseMovie(Movie movie)
     {
         if(Has(movie)) return Result.Fail("Customer has this movie!");
-        var price = movie.LicensingType.GetPrice() * CustomerStatus.Status.GetDiscount();
+        var modifier = 1 - CustomerStatus.GetDiscount();
+        var price = movie.GetPrice(modifier);
         
         var priceResult = Money.Create(price);
         if (priceResult.IsFailed) return Result.Fail("Error creating money spent!");
@@ -59,6 +55,10 @@ public class Customer
         MoneySpent += priceResult.Value;
         return Result.Ok();
     }
+
+    private bool Has(Movie movie) =>
+        _purchasedMovies.Any(pm =>
+            pm.Movie == movie && !(pm.ExpirationDate.IsExpired()));
 
     private bool HasEnoughMoviesInRecentTime()
     {

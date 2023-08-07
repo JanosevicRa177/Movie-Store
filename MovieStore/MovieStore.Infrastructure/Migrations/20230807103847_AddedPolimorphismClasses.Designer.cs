@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MovieStore.Infrastructure;
 
@@ -11,9 +12,11 @@ using MovieStore.Infrastructure;
 namespace MovieStore.Infrastructure.Migrations
 {
     [DbContext(typeof(MovieStoreContext))]
-    partial class MovieStoreContextModelSnapshot : ModelSnapshot
+    [Migration("20230807103847_AddedPolimorphismClasses")]
+    partial class AddedPolimorphismClasses
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,6 +31,10 @@ namespace MovieStore.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -41,6 +48,10 @@ namespace MovieStore.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Customers");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("Customer");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("MovieStore.Core.Model.Movie", b =>
@@ -48,6 +59,10 @@ namespace MovieStore.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("LicensingType")
                         .HasColumnType("int");
@@ -60,7 +75,7 @@ namespace MovieStore.Infrastructure.Migrations
 
                     b.ToTable("Movies");
 
-                    b.HasDiscriminator<int>("LicensingType");
+                    b.HasDiscriminator<string>("Discriminator").HasValue("Movie");
 
                     b.UseTphMappingStrategy();
                 });
@@ -92,18 +107,32 @@ namespace MovieStore.Infrastructure.Migrations
                     b.ToTable("PurchasedMovies");
                 });
 
+            modelBuilder.Entity("MovieStore.Core.Model.AdvancedCustomer", b =>
+                {
+                    b.HasBaseType("MovieStore.Core.Model.Customer");
+
+                    b.HasDiscriminator().HasValue("AdvancedCustomer");
+                });
+
+            modelBuilder.Entity("MovieStore.Core.Model.RegularCustomer", b =>
+                {
+                    b.HasBaseType("MovieStore.Core.Model.Customer");
+
+                    b.HasDiscriminator().HasValue("RegularCustomer");
+                });
+
             modelBuilder.Entity("MovieStore.Core.Model.LifelongMovie", b =>
                 {
                     b.HasBaseType("MovieStore.Core.Model.Movie");
 
-                    b.HasDiscriminator().HasValue(1);
+                    b.HasDiscriminator().HasValue("LifelongMovie");
                 });
 
             modelBuilder.Entity("MovieStore.Core.Model.TwoDayMovie", b =>
                 {
                     b.HasBaseType("MovieStore.Core.Model.Movie");
 
-                    b.HasDiscriminator().HasValue(0);
+                    b.HasDiscriminator().HasValue("TwoDayMovie");
                 });
 
             modelBuilder.Entity("MovieStore.Core.Model.Customer", b =>

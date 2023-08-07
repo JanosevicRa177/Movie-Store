@@ -1,12 +1,11 @@
 
-import { CustomerClient, GetCurrentCustomerRoleResponse, Role } from './../../api/api-reference';
+import { CustomerClient, Role } from './../../api/api-reference';
 import { Component } from '@angular/core';
 import { MsalService } from '@azure/msal-angular';
 import { Route } from '../../../model/utils';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { RoleService } from 'src/app/services/role.service';
-import { lastValueFrom } from 'rxjs';
 
 @Component({
     selector: 'app-header',

@@ -21,6 +21,6 @@ public class PurchasedMovie
         Movie = movie;
         Customer = customer;
         PurchaseDate = DateTime.Now;
-        ExpirationDate = movie.LicensingType.GetExpirationDate();
+        ExpirationDate = movie.GetExpirationDate();
     }
 }

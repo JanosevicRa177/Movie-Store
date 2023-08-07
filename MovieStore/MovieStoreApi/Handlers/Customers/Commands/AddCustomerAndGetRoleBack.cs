@@ -6,11 +6,11 @@ using MovieStore.Core.Model;
 using MovieStore.Core.ValueObjects;
 using MovieStoreApi.Repositories.Interfaces;
 
-namespace MovieStoreApi.Handlers.Customers.Queries;
+namespace MovieStoreApi.Handlers.Customers.Commands;
 
-public static class GetCurrentCustomerRole
+public static class AddCustomerAndGetRoleBack
 {
-    public class Query : IRequest<Result<Response>>
+    public class Command : IRequest<Result<Response>>
     {
         public string Email { get; set; } = string.Empty;
     }
@@ -20,7 +20,7 @@ public static class GetCurrentCustomerRole
         [Required]
         public Role Role { get; set; }
     }
-    public class RequestHandler : IRequestHandler<Query, Result<Response>>
+    public class RequestHandler : IRequestHandler<Command, Result<Response>>
     {
         private readonly IRepository<Customer> _customerRepository;
 
@@ -29,7 +29,7 @@ public static class GetCurrentCustomerRole
             _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
         }
 
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
@@ -46,6 +46,7 @@ public static class GetCurrentCustomerRole
             if (customer != null) return HttpHandler.Ok(new Response { Role = customer.Role });
 
             customer = new Customer(emailResult.Value);
+            
             _customerRepository.Add(customer);
             _customerRepository.SaveChanges();
             return HttpHandler.Ok(new Response { Role = customer.Role });

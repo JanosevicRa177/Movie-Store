@@ -2,6 +2,7 @@
 using MediatR;
 using MovieStore.Core.Enum;
 using MovieStore.Core.Model;
+using MovieStoreApi.Factories;
 using MovieStoreApi.Repositories.Interfaces;
 
 namespace MovieStoreApi.Handlers.Movies.Commands;
@@ -26,8 +27,11 @@ public static class AddMovie
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
-
-            _movieRepository.Add(new Movie(request.Name,request.LicensingType));
+            
+            var movie = MovieFactory.CreateMovie(request.Name, request.LicensingType);
+            if(movie == null) return HttpHandler.BadRequest();
+            
+            _movieRepository.Add(movie);
             _movieRepository.SaveChanges();
             
             return HttpHandler.Ok();

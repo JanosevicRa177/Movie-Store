@@ -1,4 +1,4 @@
-import { CustomerClient, GetCurrentCustomerRoleResponse } from './../api/api-reference';
+import { AddCustomerAndGetRoleBackResponse, CustomerClient, } from './../api/api-reference';
 import { MsalService } from '@azure/msal-angular';
 import { Injectable } from '@angular/core';
 import { Role } from '../api/api-reference';
@@ -19,7 +19,7 @@ export class RoleService {
     readonly getCustomerRole = async () => {
         const account = this.authService.instance.getActiveAccount();
         if (account == null) return
-        this.customerClient.getCurrentCustomerRole().subscribe((res: GetCurrentCustomerRoleResponse) => {
+        this.customerClient.getOrAddCustomer().subscribe((res: AddCustomerAndGetRoleBackResponse) => {
             this.updateRole(res.role)
         });
     }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using MovieStore.Core.Enum;
 using MovieStore.Core.Model;
 using MovieStore.Core.ValueObjects;
 
@@ -31,5 +32,6 @@ public class CustomerConfiguration: IEntityTypeConfiguration<Customer>
         builder.Property(customer => customer.MoneySpent)
             .HasConversion(moneySpent => moneySpent.Amount,
                 money => Money.Create(money).Value);
+
     }
 }

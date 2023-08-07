@@ -1,21 +1,21 @@
 ﻿using MovieStore.Core.Enum;
+using MovieStore.Core.ValueObjects;
 
 namespace MovieStore.Core.Model;
 
-public class Movie
+public abstract class Movie
 {
     public Guid Id { get; private set; }
     public string Name { get; private set; } = null!;
-    public LicensingType LicensingType { get; private set; }
+    public LicensingType LicensingType { get; protected set; }
 
     public Movie()
     {
     }
 
-    public Movie(string name, LicensingType licensingType)
+    protected Movie(string name)
     {
         Name = name;
-        LicensingType = licensingType;
     }
 
     public void Update(string name, LicensingType licensingType)
@@ -23,5 +23,10 @@ public class Movie
         Name = name;
         LicensingType = licensingType;
     }
+
+    protected abstract decimal GetBasePrice();
+
+    public decimal GetPrice(decimal modifier) => modifier * GetBasePrice();
+    public abstract ExpirationDate GetExpirationDate();
 
 }

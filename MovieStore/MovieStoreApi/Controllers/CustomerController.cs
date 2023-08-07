@@ -38,27 +38,15 @@ public class CustomerController : ControllerBase
         var response = await _mediator.Send(new GetCustomers.Query());
         return response.ToActionResult();
     }
-    
-    [HttpPost]
+
     [AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> Add(CustomerDto customerDto)
-    {
-        var response = await _mediator.Send(new AddCustomer.Command
-        {
-                Email = customerDto.Email
-        });
-        return response.ToCreatedResult();
-    }
-    
-    [AllowAnonymous]
-    [HttpGet("current")]
+    [HttpPost("current")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<GetCurrentCustomerRole.Response>> GetCurrentCustomerRole()
+    public async Task<ActionResult<AddCustomerAndGetRoleBack.Response>> GetOrAddCustomer()
     {
         var email = GetUserEmail();
-        var currentCustomerResponse = await _mediator.Send(new GetCurrentCustomerRole.Query()
+        var currentCustomerResponse = await _mediator.Send(new AddCustomerAndGetRoleBack.Command()
         {
             Email = email
         });
