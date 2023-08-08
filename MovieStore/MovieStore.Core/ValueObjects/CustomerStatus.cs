@@ -1,5 +1,4 @@
-﻿using FluentResults;
-using MovieStore.Core.Enum;
+﻿using MovieStore.Core.Enum;
 
 namespace MovieStore.Core.ValueObjects;
 
@@ -16,7 +15,7 @@ public record CustomerStatus()
     
     public static CustomerStatus Regular => new CustomerStatus(ExpirationDate.Infinite, Status.Regular);
 
-    public bool IsAdvanced() => Status == Enum.Status.Advanced && !ExpirationDate.IsExpired();
+    public bool IsAdvanced() => Status == Status.Advanced && !ExpirationDate.IsExpired();
 
     public decimal GetDiscount() => IsAdvanced() ? 0.2m : 0m;
 };

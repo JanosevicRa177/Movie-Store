@@ -1,12 +1,16 @@
 using System.Reflection;
+using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using MovieStore.Core.Model;
 using MovieStore.Infrastructure;
 using MovieStoreApi;
+using MovieStoreApi.Behaviors;
 using MovieStoreApi.Repositories;
 using MovieStoreApi.Repositories.Interfaces;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +24,8 @@ builder.Services.AddScoped<IRepository<Customer>, CustomerRepository>();
 builder.Services.AddScoped<IRepository<Movie>, MovieRepository>();
 builder.Services.AddScoped<IRepository<PurchasedMovie>, PurchasedMovieRepository>();
 
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+
 builder.Services.AddMediatR(cfg => {
     cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
 });
@@ -30,6 +36,13 @@ builder.Services.AddOpenApiDocument(cfg =>
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+
+builder.Host.UseSerilog((hostingContext, loggerConfiguration) =>
+{
+    loggerConfiguration
+        .ReadFrom
+        .Configuration(hostingContext.Configuration);
+});
 
 var app = builder.Build();
 
@@ -62,4 +75,8 @@ app.UseHttpsRedirection();
 
 app.MapControllers();
 
+app.Logger.LogInformation("Starting Application");
+
 app.Run("http://localhost:8085");
+
+app.Logger.LogInformation("Application shutdown");
