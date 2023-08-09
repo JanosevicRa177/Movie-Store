@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using MovieStore.Core.Model;
 using MovieStore.Infrastructure;
 using MovieStoreApi.Repositories.Interfaces;
@@ -12,5 +13,11 @@ public class PurchasedMovieRepository: GenericRepository<PurchasedMovie>
         ctx.PurchasedMovies
             .Include(movie => movie.Customer)
             .Include(movie => movie.Movie);
+    }
+    
+    public override IEnumerable<PurchasedMovie> Search(Expression<Func<PurchasedMovie,bool>> predicate) {
+        return Context.Set<PurchasedMovie>()
+            .Include(movie => movie.Movie)
+            .Include(movie => movie.Customer).Where(predicate);
     }
 }

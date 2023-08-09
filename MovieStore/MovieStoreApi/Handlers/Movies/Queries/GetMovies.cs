@@ -1,46 +1,57 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using FluentResults;
+using JetBrains.Annotations;
 using MediatR;
-using MovieStore.Core.Enum;
 using MovieStore.Core.Model;
+using MovieStoreApi.Dto;
 using MovieStoreApi.Repositories.Interfaces;
 
 namespace MovieStoreApi.Handlers.Movies.Queries;
 
 public static class GetMovies
 {
-    public class Query : IRequest<Result<IEnumerable<Response>>> { }
+    public class Query : IRequest<Result<Response>>
+    {
+        public MoviePaginationDto MoviePaginationDto { get; set; } = null!;
+    }
     
     public class Response
     {
         [Required]
-        public Guid Id { get; set; }
-        public string Name { get; set; } = string.Empty;
+        public int Size{ get; set; }
         [Required]
-        public LicensingType LicensingType { get; set; }
+        public IEnumerable<MovieDto> Movies { get; set; } = null!;
     }
-    public class RequestHandler : IRequestHandler<Query, Result<IEnumerable<Response>>>
+    
+    [UsedImplicitly]
+    public class MappingProfile : Profile
     {
-        private readonly IRepository<Movie> _movieRepository;
+        public MappingProfile() => CreateMap<Movie, MovieDto>();
+    }
+    public class RequestHandler : IRequestHandler<Query, Result<Response>>
+    {
+        private readonly IMovieRepository _movieRepository;
+        private readonly IMapper _mapper;
 
-        public RequestHandler(IRepository<Movie> movieRepository)
+        public RequestHandler(IMovieRepository movieRepository, IMapper mapper)
         {
             _movieRepository = movieRepository ?? throw new ArgumentNullException(nameof(movieRepository));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public Task<Result<IEnumerable<Response>>> Handle(Query request, CancellationToken cancellationToken)
+        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
 
-            var movies = _movieRepository.GetAll();
+            var moviePage = _movieRepository
+                .GetPageByLicenseTypeAndName(request.MoviePaginationDto.LicensingType,request.MoviePaginationDto.Name,
+                    request.MoviePaginationDto.PageIndex,request.MoviePaginationDto.PageSize);
             
-            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<Movie, Response>());
-            var mapper = new Mapper(mapperConfig);
-            var movieDtos = mapper.Map<IEnumerable<Response>>(movies);
+            var movies = _mapper.Map<IEnumerable<MovieDto>>(moviePage.Item1);
 
-            return HttpHandler.Ok(movieDtos);
+            return HttpHandler.Ok(new Response{Movies = movies, Size = moviePage.Item2});
         }
     }
 }

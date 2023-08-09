@@ -40,8 +40,8 @@ export class HeaderComponent {
     readonly login = () => {
         this.authService.loginPopup().subscribe({
             next: () => {
-                this.setupCurrentCustomer()
                 this.toastr.success("Successfully logged in!")
+                this.setupCurrentCustomer()
             },
             error: () => {
                 this.toastr.error("Login failed!")

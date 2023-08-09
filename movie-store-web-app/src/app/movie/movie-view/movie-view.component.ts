@@ -1,8 +1,9 @@
 import { RoleService } from './../../services/role.service';
 import { ToastrService } from 'ngx-toastr';
-import { GetMoviesResponse, MovieClient, Role, CustomerClient, LicensingType } from './../../api/api-reference';
+import { MovieClient, Role, CustomerClient, LicensingType, MovieDto } from './../../api/api-reference';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
     selector: 'app-movie-view',
@@ -10,8 +11,14 @@ import { Router } from '@angular/router';
     styleUrls: ['./movie-view.component.css'],
 })
 export class MovieViewComponent {
-    movies: GetMoviesResponse[] = [];
+    movies: MovieDto[] = [];
     role: Role = Role.Regular;
+    length = 50;
+    pageSize = 6;
+    pageIndex = 0;
+    selectedLicensingType: LicensingType | null = null;
+    name: string = "";
+
     constructor(
         private readonly toastr: ToastrService,
         private readonly movieClient: MovieClient,
@@ -22,7 +29,22 @@ export class MovieViewComponent {
         this.roleService.userRole$.subscribe(innerRole => {
             this.role = innerRole
         })
-        movieClient.getAll().subscribe((movies) => (this.movies = movies));
+        this.handlePage(0, false)
+    }
+
+    readonly handlePage = (pageIndex: number, isSearch: boolean) => {
+        if (isSearch)
+            pageIndex = 0;
+        window.scroll({
+            top: 0,
+            left: 0,
+            behavior: 'smooth'
+        });
+        this.movieClient.getAll(this.name, this.selectedLicensingType, 6, pageIndex).subscribe((moviesPage) => {
+            this.movies = moviesPage.movies;
+            this.length = moviesPage.size
+        });
+        this.pageIndex = pageIndex;
     }
 
     readonly delete = (id: string) => {

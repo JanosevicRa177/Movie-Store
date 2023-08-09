@@ -14,9 +14,9 @@ public static class DeleteMovie
 
     public class RequestHandler : IRequestHandler<Command, Result>
     {
-        private readonly IRepository<Movie> _movieRepository;
+        private readonly IMovieRepository _movieRepository;
 
-        public RequestHandler(IRepository<Movie> movieRepository)
+        public RequestHandler(IMovieRepository movieRepository)
         {
             _movieRepository = movieRepository ?? throw new ArgumentNullException(nameof(movieRepository));
         }

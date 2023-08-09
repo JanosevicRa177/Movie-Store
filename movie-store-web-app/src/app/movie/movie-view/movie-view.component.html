@@ -2,15 +2,37 @@
     <h1>Movies</h1>
     <button mat-raised-button (click)="openNew()" class="button-link" *ngIf="hasRole(1)">Create movie</button>
 </div>
+<div class="filter-container">
+    <div class="input-container">
+        <mat-form-field>
+            <mat-label>Movie name</mat-label>
+            <input matInput placeholder="super cool movie" [(ngModel)]="name">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Lincesing type</mat-label>
+            <mat-select [(value)]="selectedLicensingType">
+                <mat-option [value]="null">Any</mat-option>
+                <mat-option [value]="0">Two day</mat-option>
+                <mat-option [value]="1">Lifelong</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <button mat-raised-button class="button-link search-button" (click)="handlePage(pageIndex,true)">Search</button>
+</div>
 <div class="flex-container">
     <div *ngFor="let movie of movies; let i = index" class="card">
         <div class="card-image"></div>
         <div class="card-content">
-            <p >{{movie.name}}</p>
+            <p>{{movie.name}}</p>
             <button mat-raised-button color="accent" *ngIf="hasRole(1)" (click)="openEdit(movie.id)">Edit</button>
             <button mat-raised-button color="warn" *ngIf="hasRole(1)" (click)="delete(movie.id)">Delete</button>
-            <button mat-raised-button color="accent" (click)="purchaseMovie(movie.id)">{{isLicenceLifelong(movie.licensingType) ? "Buy" 
+            <button mat-raised-button color="accent"
+                (click)="purchaseMovie(movie.id)">{{isLicenceLifelong(movie.licensingType) ? "Buy"
                 : "Rent"}}</button>
         </div>
     </div>
 </div>
+<mat-paginator #paginator class="paginator" (page)="handlePage($event.pageIndex,false)" [length]="length"
+    [pageSize]="pageSize" [showFirstLastButtons]="true" [hidePageSize]="true" [pageIndex]="pageIndex"
+    aria-label="Select page">
+</mat-paginator>

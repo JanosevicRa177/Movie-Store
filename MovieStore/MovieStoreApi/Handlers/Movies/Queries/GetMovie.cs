@@ -21,9 +21,9 @@ public static class GetMovie
 
     public class RequestHandler : IRequestHandler<Query, Result<Response>>
     {
-        private readonly IRepository<Movie> _movieRepository;
+        private readonly IMovieRepository _movieRepository;
 
-        public RequestHandler(IRepository<Movie> movieRepository)
+        public RequestHandler(IMovieRepository movieRepository)
         {
             _movieRepository = movieRepository ?? throw new ArgumentNullException(nameof(movieRepository));
         }

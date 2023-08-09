@@ -1,8 +1,8 @@
 using System.Reflection;
-using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
 using MovieStore.Core.Model;
 using MovieStore.Infrastructure;
@@ -10,6 +10,8 @@ using MovieStoreApi;
 using MovieStoreApi.Behaviors;
 using MovieStoreApi.Repositories;
 using MovieStoreApi.Repositories.Interfaces;
+using MovieStoreApi.Service;
+using MovieStoreApi.Service.Email;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,8 +23,15 @@ builder.Services.AddDbContext<MovieStoreContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionString")));
 
 builder.Services.AddScoped<IRepository<Customer>, CustomerRepository>();
-builder.Services.AddScoped<IRepository<Movie>, MovieRepository>();
+builder.Services.AddScoped<IMovieRepository, MovieRepository>();
 builder.Services.AddScoped<IRepository<PurchasedMovie>, PurchasedMovieRepository>();
+
+builder.Services.AddTransient<IEmailService, EmailService>();
+
+builder.Services.Configure<TimeOptions>(builder.Configuration.GetSection(TimeOptions.SectionName));
+builder.Services.AddSingleton(cfg => cfg.GetRequiredService<IOptions<TimeOptions>>().Value);
+builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection(EmailOptions.SectionName));
+builder.Services.AddSingleton(cfg => cfg.GetRequiredService<IOptions<EmailOptions>>().Value);
 
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 
@@ -43,6 +52,8 @@ builder.Host.UseSerilog((hostingContext, loggerConfiguration) =>
         .ReadFrom
         .Configuration(hostingContext.Configuration);
 });
+
+builder.Services.AddHostedService<HostedService>();
 
 var app = builder.Build();
 

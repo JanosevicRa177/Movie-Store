@@ -1,4 +1,4 @@
-import { MovieClient, MovieDto } from '../../api/api-reference';
+import { CreateMovieDto, MovieClient, MovieDto } from '../../api/api-reference';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -56,8 +56,8 @@ export class MovieNewEditViewComponent {
         });
     };
 
-    private readonly getMovieDto = (): MovieDto => {
-        return new MovieDto({
+    private readonly getMovieDto = (): CreateMovieDto => {
+        return new CreateMovieDto({
             name: this.movieForm.value.name,
             licensingType: Number(this.movieForm.value.licensingType),
         });

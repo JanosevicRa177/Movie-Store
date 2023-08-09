@@ -471,10 +471,10 @@ export class CustomerClient implements ICustomerClient {
 
 export interface IMovieClient {
     getById(id: string): Observable<GetMovieResponse>;
-    update(id: string, movieDto: MovieDto): Observable<void>;
+    update(id: string, createMovieDto: CreateMovieDto): Observable<void>;
     delete(id: string): Observable<void>;
-    add(movieDto: MovieDto): Observable<void>;
-    getAll(): Observable<GetMoviesResponse[]>;
+    add(createMovieDto: CreateMovieDto): Observable<void>;
+    getAll(name: string | null | undefined, licensingType: LicensingType | null | undefined, pageSize: number | undefined, pageIndex: number | undefined): Observable<GetMoviesResponse>;
 }
 
 @Injectable({
@@ -548,14 +548,14 @@ export class MovieClient implements IMovieClient {
         return _observableOf(null as any);
     }
 
-    update(id: string, movieDto: MovieDto): Observable<void> {
+    update(id: string, createMovieDto: CreateMovieDto): Observable<void> {
         let url_ = this.baseUrl + "/movie/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(movieDto);
+        const content_ = JSON.stringify(createMovieDto);
 
         let options_ : any = {
             body: content_,
@@ -660,11 +660,11 @@ export class MovieClient implements IMovieClient {
         return _observableOf(null as any);
     }
 
-    add(movieDto: MovieDto): Observable<void> {
+    add(createMovieDto: CreateMovieDto): Observable<void> {
         let url_ = this.baseUrl + "/movie";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(movieDto);
+        const content_ = JSON.stringify(createMovieDto);
 
         let options_ : any = {
             body: content_,
@@ -708,8 +708,20 @@ export class MovieClient implements IMovieClient {
         return _observableOf(null as any);
     }
 
-    getAll(): Observable<GetMoviesResponse[]> {
-        let url_ = this.baseUrl + "/movie";
+    getAll(name: string | null | undefined, licensingType: LicensingType | null | undefined, pageSize: number | undefined, pageIndex: number | undefined): Observable<GetMoviesResponse> {
+        let url_ = this.baseUrl + "/movie?";
+        if (name !== undefined && name !== null)
+            url_ += "Name=" + encodeURIComponent("" + name) + "&";
+        if (licensingType !== undefined && licensingType !== null)
+            url_ += "LicensingType=" + encodeURIComponent("" + licensingType) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        if (pageIndex === null)
+            throw new Error("The parameter 'pageIndex' cannot be null.");
+        else if (pageIndex !== undefined)
+            url_ += "PageIndex=" + encodeURIComponent("" + pageIndex) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -727,14 +739,14 @@ export class MovieClient implements IMovieClient {
                 try {
                     return this.processGetAll(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<GetMoviesResponse[]>;
+                    return _observableThrow(e) as any as Observable<GetMoviesResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<GetMoviesResponse[]>;
+                return _observableThrow(response_) as any as Observable<GetMoviesResponse>;
         }));
     }
 
-    protected processGetAll(response: HttpResponseBase): Observable<GetMoviesResponse[]> {
+    protected processGetAll(response: HttpResponseBase): Observable<GetMoviesResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -745,14 +757,7 @@ export class MovieClient implements IMovieClient {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200!.push(GetMoviesResponse.fromJS(item));
-            }
-            else {
-                result200 = <any>null;
-            }
+            result200 = GetMoviesResponse.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -1047,11 +1052,11 @@ export enum LicensingType {
     Lifelong = 1,
 }
 
-export class MovieDto implements IMovieDto {
+export class CreateMovieDto implements ICreateMovieDto {
     name?: string;
     licensingType?: LicensingType;
 
-    constructor(data?: IMovieDto) {
+    constructor(data?: ICreateMovieDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1067,9 +1072,9 @@ export class MovieDto implements IMovieDto {
         }
     }
 
-    static fromJS(data: any): MovieDto {
+    static fromJS(data: any): CreateMovieDto {
         data = typeof data === 'object' ? data : {};
-        let result = new MovieDto();
+        let result = new CreateMovieDto();
         result.init(data);
         return result;
     }
@@ -1082,17 +1087,68 @@ export class MovieDto implements IMovieDto {
     }
 }
 
-export interface IMovieDto {
+export interface ICreateMovieDto {
     name?: string;
     licensingType?: LicensingType;
 }
 
 export class GetMoviesResponse implements IGetMoviesResponse {
-    id!: string;
-    name?: string;
-    licensingType!: LicensingType;
+    size!: number;
+    movies!: MovieDto[];
 
     constructor(data?: IGetMoviesResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.movies = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.size = _data["size"];
+            if (Array.isArray(_data["movies"])) {
+                this.movies = [] as any;
+                for (let item of _data["movies"])
+                    this.movies!.push(MovieDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): GetMoviesResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetMoviesResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["size"] = this.size;
+        if (Array.isArray(this.movies)) {
+            data["movies"] = [];
+            for (let item of this.movies)
+                data["movies"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IGetMoviesResponse {
+    size: number;
+    movies: MovieDto[];
+}
+
+export class MovieDto implements IMovieDto {
+    id!: string;
+    name!: string;
+    licensingType!: LicensingType;
+
+    constructor(data?: IMovieDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1109,9 +1165,9 @@ export class GetMoviesResponse implements IGetMoviesResponse {
         }
     }
 
-    static fromJS(data: any): GetMoviesResponse {
+    static fromJS(data: any): MovieDto {
         data = typeof data === 'object' ? data : {};
-        let result = new GetMoviesResponse();
+        let result = new MovieDto();
         result.init(data);
         return result;
     }
@@ -1125,9 +1181,9 @@ export class GetMoviesResponse implements IGetMoviesResponse {
     }
 }
 
-export interface IGetMoviesResponse {
+export interface IMovieDto {
     id: string;
-    name?: string;
+    name: string;
     licensingType: LicensingType;
 }
 

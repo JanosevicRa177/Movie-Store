@@ -17,8 +17,8 @@ public static class AddMovie
 
     public class RequestHandler : IRequestHandler<Command,Result> 
     {
-        private readonly IRepository<Movie> _movieRepository;
-        public RequestHandler(IRepository<Movie> movieRepository)
+        private readonly IMovieRepository _movieRepository;
+        public RequestHandler(IMovieRepository movieRepository)
         {
             _movieRepository = movieRepository ?? throw new ArgumentNullException(nameof(movieRepository));
         }

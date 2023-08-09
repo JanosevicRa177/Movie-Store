@@ -32,31 +32,31 @@ public class MovieController : ControllerBase
     
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> Add([FromBody]MovieDto movieDto)
+    public async Task<IActionResult> Add([FromBody]CreateMovieDto createMovieDto)
     {
         var response = await _mediator.Send(new AddMovie.Command
         {
-                Name = movieDto.Name,
-                LicensingType = movieDto.LicensingType
+                Name = createMovieDto.Name,
+                LicensingType = createMovieDto.LicensingType
         });
         return response.ToCreatedResult();
     }
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<GetMovies.Response>>> GetAll()
+    public async Task<ActionResult<GetMovies.Response>> GetAll([FromQuery] MoviePaginationDto moviePaginationDto)
     {
-        var response = await _mediator.Send(new GetMovies.Query());
+        var response = await _mediator.Send(new GetMovies.Query{MoviePaginationDto = moviePaginationDto});
         return response.ToActionResult();
     }
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update([FromBody]MovieDto movieDto,Guid id)
+    public async Task<IActionResult> Update([FromBody]CreateMovieDto createMovieDto,Guid id)
     {
         var response = await _mediator.Send(new UpdateMovie.Command
         {
                 Id = id,
-                Name = movieDto.Name,
-                LicensingType = movieDto.LicensingType
+                Name = createMovieDto.Name,
+                LicensingType = createMovieDto.LicensingType
         });
         return response.ToActionResult();
     }

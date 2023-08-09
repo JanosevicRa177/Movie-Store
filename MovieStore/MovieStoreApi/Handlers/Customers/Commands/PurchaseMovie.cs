@@ -17,9 +17,9 @@ public static class PurchaseMovie
     public class RequestHandler : IRequestHandler<Command, Result> 
     {
         private readonly IRepository<Customer> _customerRepository;
-        private readonly IRepository<Movie> _movieRepository;
+        private readonly IMovieRepository _movieRepository;
         
-        public RequestHandler(IRepository<Customer> customerRepository, IRepository<Movie> movieRepository)
+        public RequestHandler(IRepository<Customer> customerRepository, IMovieRepository movieRepository)
         {
             _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
             _movieRepository = movieRepository ?? throw new ArgumentNullException(nameof(movieRepository));
