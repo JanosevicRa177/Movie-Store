@@ -46,7 +46,7 @@ public static class GetCustomer
                 throw new ArgumentNullException(nameof(request));
 
             var customer = _customerRepository.GetById(request.Id);
-            if (customer == null) return HttpHandler.NotFound<Response>();
+            if (customer == null) return HttpHandler.NotFound<Response>("Can't find customer!");
 
             var customersDto = _mapper.Map<Response>(customer);
             

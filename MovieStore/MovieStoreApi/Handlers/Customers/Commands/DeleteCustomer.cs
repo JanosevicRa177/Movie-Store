@@ -27,7 +27,7 @@ public static class DeleteCustomer
 
                 var customer = _customerRepository.GetById(request.Id);
                 if (customer == null)
-                    return HttpHandler.NotFound();
+                    return HttpHandler.NotFound("Can't find customer!");
 
                 _customerRepository.Delete(customer);
                 _customerRepository.SaveChanges();

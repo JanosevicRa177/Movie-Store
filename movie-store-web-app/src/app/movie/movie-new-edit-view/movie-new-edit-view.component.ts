@@ -1,9 +1,11 @@
 import { CreateMovieDto, MovieClient, MovieDto } from '../../api/api-reference';
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators, ValidationErrors } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { LicensingType } from 'src/app/api/api-reference';
+import { convertStringToCamelCase } from 'src/app/util/string.converter';
+import { toastError } from 'src/app/util/toastr';
 
 @Component({
     selector: 'app-movie-new-edit-view',
@@ -43,7 +45,8 @@ export class MovieNewEditViewComponent {
                 this.router.navigate(['/movie/all']);
             },
             error: (error: any) => {
-                this.toastr.error(error)
+                this.setErrors(error);
+                toastError(this.toastr, error)
             },
         });
     };
@@ -54,14 +57,30 @@ export class MovieNewEditViewComponent {
                 this.toastr.success('Successfuly updated movie!');
                 this.router.navigate(['/movie/all']);
             },
-            error: () => this.toastr.error('Failed to update movie.'),
+            error: (error: any) => {
+                this.setErrors(error);
+                toastError(this.toastr, error)
+            },
         });
     };
 
     private readonly getMovieDto = (): CreateMovieDto => {
         return new CreateMovieDto({
-            name: this.movieForm.value.name,
+            name: this.movieForm.value.name ?? "",
             licensingType: Number(this.movieForm.value.licensingType),
+        });
+    }
+
+    private readonly setErrors = (error: any) => {
+        var movieForm = this.movieForm;
+        Object.keys(error.errors).forEach(function (key) {
+            var errorString = ""
+            var errors: string[] = [];
+            error.errors[key].forEach((error: string | undefined) => {
+                errors.push(error ?? "")
+            });
+            errorString = errors.join(" | ")
+            movieForm.get(convertStringToCamelCase(key))?.setErrors({ custom: errorString });
         });
     }
 }

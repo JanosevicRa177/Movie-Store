@@ -34,7 +34,8 @@ public static class GetMovie
                 throw new ArgumentNullException(nameof(request));
 
             var movie = _movieRepository.GetById(request.Id);
-            return movie != null ? HttpHandler.Ok(new Response{Id = movie.Id,Name = movie.Name, LicensingType = movie.LicensingType}) : HttpHandler.NotFound<Response>();
+            return movie != null ? HttpHandler.Ok(new Response{Id = movie.Id,Name = movie.Name, LicensingType = movie.LicensingType})
+                : HttpHandler.NotFound<Response>("Can't find movie!");
         }
     }
 }

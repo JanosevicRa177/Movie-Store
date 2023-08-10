@@ -37,10 +37,13 @@ public abstract class UpdateMovie
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
-
-            var movie = _movieRepository.GetById(request.Id);
+            
+            var movie = _movieRepository.Search(movie1 => movie1.Name == request.Name && movie1.Id != request.Id).FirstOrDefault();
+            if(movie != null) return HttpHandler.BadRequest("Movie with this name already exists!");
+            
+            movie = _movieRepository.GetById(request.Id);
             if (movie == null)
-                return HttpHandler.NotFound();
+                return HttpHandler.NotFound("Can't find movie!");
 
             movie.Update( request.Name, request.LicensingType);
             _movieRepository.SaveChanges();

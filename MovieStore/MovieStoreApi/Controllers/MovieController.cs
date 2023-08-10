@@ -31,6 +31,7 @@ public class MovieController : ControllerBase
     
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Add([FromBody]CreateMovieDto createMovieDto)
     {
         var response = await _mediator.Send(new AddMovie.Command
@@ -49,6 +50,7 @@ public class MovieController : ControllerBase
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Update([FromBody]CreateMovieDto createMovieDto,Guid id)
     {
         var response = await _mediator.Send(new UpdateMovie.Command

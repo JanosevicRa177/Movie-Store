@@ -30,7 +30,7 @@ public static class PromoteCustomer
 
             var customer = _customerRepository.GetById(request.Id);
             if (customer == null)
-                return HttpHandler.NotFound();
+                return HttpHandler.NotFound("Can't find customer!");
             var result = customer.Promote();
             if(result.IsFailed)  return HttpHandler.BadRequest();
             _customerRepository.SaveChanges();

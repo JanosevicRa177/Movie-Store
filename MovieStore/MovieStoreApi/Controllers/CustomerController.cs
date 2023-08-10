@@ -67,6 +67,7 @@ public class CustomerController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Update([FromBody]CustomerDto customerDto,Guid id)
     {
         var response = await _mediator.Send(new UpdateCustomer.Command
@@ -81,6 +82,7 @@ public class CustomerController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PurchaseMovie(Guid movieId)
     {
         var email = GetUserEmail();

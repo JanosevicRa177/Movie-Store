@@ -35,14 +35,17 @@ public static class UpdateCustomer
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
-
-            var customer = _customerRepository.GetById(request.Id);
-            if (customer == null)
-                return HttpHandler.NotFound();
             
             var emailResult = Email.Create(request.Email);
             if (emailResult.IsFailed)
-                return HttpHandler.BadRequest();
+                return HttpHandler.BadRequest("Invalid email!");
+            
+            var customer = _customerRepository.Search(customer1  => customer1.Email == emailResult.Value && customer1.Id != request.Id).FirstOrDefault();
+            if(customer != null) return HttpHandler.BadRequest("Customer with this email already exists!");
+
+            customer = _customerRepository.GetById(request.Id);
+            if (customer == null)
+                return HttpHandler.NotFound("Customer not found!");
 
             customer.Update(emailResult.Value);
             _customerRepository.SaveChanges();

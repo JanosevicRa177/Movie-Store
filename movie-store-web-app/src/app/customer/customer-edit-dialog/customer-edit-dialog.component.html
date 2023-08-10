@@ -4,7 +4,9 @@
         <mat-form-field>
             <mat-label>Enter email</mat-label>
             <input matInput placeholder="email@example.com" formControlName="email" required>
-            <mat-error *ngIf="customerForm.get('email')?.invalid"></mat-error>
+            <mat-error *ngIf="customerForm.get('email')?.errors?.['required']">Email is required field</mat-error>
+            <mat-error
+                *ngIf="customerForm.get('email')?.invalid">{{customerForm.get('email')?.getError('custom')}}</mat-error>
         </mat-form-field>
     </form>
     <div mat-dialog-actions>

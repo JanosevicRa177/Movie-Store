@@ -1,9 +1,11 @@
 import { CustomerClient, CustomerDto } from './../../api/api-reference';
 import { Component, Inject } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { GetCustomersResponse } from 'src/app/api/api-reference';
+import { convertStringToCamelCase } from 'src/app/util/string.converter';
+import { toastError } from 'src/app/util/toastr';
 
 @Component({
     selector: 'app-customer-edit-dialog',
@@ -32,7 +34,22 @@ export class CustomerEditDialogComponent {
                     this.toastr.success('Successfuly updated customer!');
                     this.dialogRef.close();
                 },
-                error: () => this.toastr.error('Failed to update customer.'),
+                error: (error: any) => {
+                    this.setErrors(error);
+                    toastError(this.toastr, error)
+                },
             });
     };
+    private readonly setErrors = (error: any) => {
+        var customerForm = this.customerForm;
+        Object.keys(error.errors).forEach(function (key) {
+            var errorString = ""
+            var errors: string[] = [];
+            error.errors[key].forEach((error: string | undefined) => {
+                errors.push(error ?? "");
+            });
+            errorString = errors.join(" | ")
+            customerForm.get(convertStringToCamelCase(key))?.setErrors({ custom: errorString });
+        });
+    }
 }

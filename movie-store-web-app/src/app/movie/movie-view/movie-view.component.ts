@@ -3,7 +3,8 @@ import { ToastrService } from 'ngx-toastr';
 import { MovieClient, Role, CustomerClient, LicensingType, MovieDto } from './../../api/api-reference';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { PageEvent } from '@angular/material/paginator';
+import { toastError } from 'src/app/util/toastr';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-movie-view',
@@ -53,7 +54,7 @@ export class MovieViewComponent {
                 this.movies = this.movies.filter((movie) => movie.id !== id);
                 this.toastr.success('Successfuly deleted movie');
             },
-            error: (e: any) => this.toastr.error('Failed to delete movie'),
+            error: (error: any) => toastError(this.toastr, error),
         });
     };
     readonly openNew = () => {
@@ -65,7 +66,7 @@ export class MovieViewComponent {
     readonly purchaseMovie = (movieId: string) => {
         this.customerClient.purchaseMovie(movieId).subscribe({
             next: () => this.toastr.success('Movie bought!'),
-            error: () => this.toastr.error('Failed to buy a movie.'),
+            error: (error) => toastError(this.toastr, error),
         });
     };
     readonly hasRole = (role: Role): boolean => {

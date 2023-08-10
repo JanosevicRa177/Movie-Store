@@ -45,11 +45,11 @@ public static class AddCustomerAndGetRoleBack
             
             var emailResult = Email.Create(request.Email);
             if (emailResult.IsFailed)
-                return HttpHandler.BadRequest<Response>();
+                return HttpHandler.BadRequest<Response>("Invalid email");
             
             var moneyResult = Money.Create(0);
             if (moneyResult.IsFailed)
-                return HttpHandler.BadRequest<Response>();
+                return HttpHandler.BadRequest<Response>("Unable to create customer");
 
             var customer = _customerRepository.Search(x => x.Email == emailResult.Value).FirstOrDefault();
             if (customer != null) return HttpHandler.Ok(new Response { Role = customer.Role });

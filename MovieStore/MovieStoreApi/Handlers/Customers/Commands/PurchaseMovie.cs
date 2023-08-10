@@ -41,16 +41,16 @@ public static class PurchaseMovie
             
             var emailResult = Email.Create(request.CustomerEmail);
             if (emailResult.IsFailed)
-                return HttpHandler.BadRequest();
+                return HttpHandler.BadRequest("Email not valid!");
 
             var customer = _customerRepository.Search(x => x.Email == emailResult.Value).FirstOrDefault();
-            if (customer == null) return HttpHandler.NotFound();
+            if (customer == null) return HttpHandler.NotFound("Couldn't find you");
             
             var movie = _movieRepository.GetById(request.MovieId);
-            if (movie == null) return HttpHandler.NotFound();
+            if (movie == null) return HttpHandler.NotFound("This movie does not exists");
 
             var result = customer.PurchaseMovie(movie);
-            if (result.IsFailed) return HttpHandler.BadRequest();
+            if (result.IsFailed) return HttpHandler.BadRequest(result.Errors.First().Message ?? "");
             _customerRepository.SaveChanges();
             
             return HttpHandler.Ok();

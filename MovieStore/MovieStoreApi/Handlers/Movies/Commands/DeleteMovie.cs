@@ -29,7 +29,7 @@ public static class DeleteMovie
             var movie = _movieRepository.GetById(request.Id);
             
             if (movie == null)
-                return HttpHandler.NotFound();
+                return HttpHandler.NotFound("Can't find movie!");
             
             _movieRepository.Delete(movie);
             _movieRepository.SaveChanges();

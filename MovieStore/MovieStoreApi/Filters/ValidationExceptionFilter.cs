@@ -15,10 +15,11 @@ public class ValidationExceptionFilter : IExceptionFilter
     
     public void OnException(ExceptionContext context)
     {
-        
-        if (context.Exception is not ValidationException validationException) return;
-        _logger.LogError("[ERROR] Validation exception occurred while executing request");
-        context.Result = context.HttpContext.InvalidResponseFrom(validationException);
+        if (context.Exception is ValidationException validationException)
+        {
+            _logger.LogError("[ERROR] Validation exception occurred while executing request");
+            context.Result = context.HttpContext.InvalidResponseFrom(validationException);
+        }
         return;
     }
 }
