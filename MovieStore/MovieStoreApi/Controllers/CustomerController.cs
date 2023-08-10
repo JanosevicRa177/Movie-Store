@@ -45,13 +45,12 @@ public class CustomerController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<AddCustomerAndGetRoleBack.Response>> GetOrAddCustomer()
     {
-        var email = GetUserEmail();
-        var currentCustomerResponse = await _mediator.Send(new AddCustomerAndGetRoleBack.Command()
-        {
-            Email = email
-        });
-
-        return currentCustomerResponse.ToActionResult();
+            var email = GetUserEmail();
+            var currentCustomerResponse = await _mediator.Send(new AddCustomerAndGetRoleBack.Command()
+            {
+                Email = email
+            });
+            return currentCustomerResponse.ToActionResult();
     }
 
     [HttpDelete("{id}")]

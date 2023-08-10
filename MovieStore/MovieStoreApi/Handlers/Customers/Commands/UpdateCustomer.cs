@@ -1,4 +1,5 @@
 ﻿using FluentResults;
+using FluentValidation;
 using MediatR;
 using MovieStore.Core.Model;
 using MovieStore.Core.ValueObjects;
@@ -12,6 +13,14 @@ public static class UpdateCustomer
     {
         public Guid Id { get; set; }
         public string Email { get; set; } = null!;
+    }
+    
+    public class UpdateCustomerCommandValidator : AbstractValidator<Command> 
+    {
+        public UpdateCustomerCommandValidator()
+        {
+            RuleFor(x => x.Email).EmailAddress();
+        }
     }
     
     public class RequestHandler : IRequestHandler<Command,Result> 

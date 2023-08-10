@@ -2,7 +2,7 @@
 
 public class NotFoundError: HttpError
 {
-    public NotFoundError() : base(StatusCodes.Status404NotFound)
+    public NotFoundError(string message) : base(StatusCodes.Status404NotFound, message)
     {
     }
 }

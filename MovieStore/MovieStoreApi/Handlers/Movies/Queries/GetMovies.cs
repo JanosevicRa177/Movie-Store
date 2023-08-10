@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using FluentResults;
+using FluentValidation;
 using JetBrains.Annotations;
 using MediatR;
 using MovieStore.Core.Model;
@@ -14,6 +15,14 @@ public static class GetMovies
     public class Query : IRequest<Result<Response>>
     {
         public MoviePaginationDto MoviePaginationDto { get; set; } = null!;
+    }
+    
+    public class UpdateMovieCommandValidator : AbstractValidator<Query> 
+    {
+        public UpdateMovieCommandValidator()
+        {
+            RuleFor(x => x.MoviePaginationDto).SetValidator(new MoviePaginationDtoValidator());
+        }
     }
     
     public class Response

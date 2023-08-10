@@ -2,7 +2,7 @@
 
 public class BadRequestError:HttpError
 {
-    public BadRequestError() : base(StatusCodes.Status400BadRequest)
+    public BadRequestError(string message) : base(StatusCodes.Status400BadRequest, message)
     {
     }
 }

@@ -1,4 +1,5 @@
 ﻿using FluentResults;
+using FluentValidation;
 using MediatR;
 using MovieStore.Core.Enum;
 using MovieStore.Core.Model;
@@ -13,6 +14,15 @@ public abstract class UpdateMovie
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public LicensingType LicensingType { get; set; }
+    }
+    
+    public class UpdateMovieCommandValidator : AbstractValidator<Command> 
+    {
+        public UpdateMovieCommandValidator()
+        {
+            RuleFor(x => x.Name).NotNull().NotEmpty();
+            RuleFor(x => x.LicensingType).IsInEnum();
+        }
     }
 
     public class RequestHandler : IRequestHandler<Command, Result>

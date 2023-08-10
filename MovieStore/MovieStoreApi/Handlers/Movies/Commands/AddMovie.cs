@@ -1,4 +1,5 @@
 ﻿using FluentResults;
+using FluentValidation;
 using MediatR;
 using MovieStore.Core.Enum;
 using MovieStore.Core.Model;
@@ -14,6 +15,15 @@ public static class AddMovie
         public string Name { get; set; } = string.Empty;
         public LicensingType LicensingType { get; set; }
     }
+    
+    public class AddMovieCommandValidator : AbstractValidator<Command> 
+    {
+        public AddMovieCommandValidator()
+        {
+            RuleFor(x => x.Name).NotNull().NotEmpty();
+            RuleFor(x => x.LicensingType).IsInEnum();
+        }
+    }
 
     public class RequestHandler : IRequestHandler<Command,Result> 
     {
@@ -27,9 +37,12 @@ public static class AddMovie
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
-            
-            var movie = MovieFactory.CreateMovie(request.Name, request.LicensingType);
-            if(movie == null) return HttpHandler.BadRequest();
+
+            var movie = _movieRepository.Search(movie1 => movie1.Name == request.Name).FirstOrDefault();
+            if(movie != null) return HttpHandler.BadRequest("Movie with this name already exists!");
+                
+                movie = MovieFactory.CreateMovie(request.Name, request.LicensingType);
+            if(movie == null) return HttpHandler.BadRequest("Failed at creating a movie!");
             
             _movieRepository.Add(movie);
             _movieRepository.SaveChanges();

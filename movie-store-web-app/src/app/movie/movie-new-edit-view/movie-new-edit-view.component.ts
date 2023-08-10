@@ -42,7 +42,9 @@ export class MovieNewEditViewComponent {
                 this.toastr.success('Successfuly created movie!');
                 this.router.navigate(['/movie/all']);
             },
-            error: () => this.toastr.error('Failed to create movie.'),
+            error: (error: any) => {
+                this.toastr.error(error)
+            },
         });
     };
 

@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MovieStore.Core.Model;
 using MovieStoreApi.Dto;
 using MovieStoreApi.Extensions;
 using MovieStoreApi.Handlers.Movies.Commands;

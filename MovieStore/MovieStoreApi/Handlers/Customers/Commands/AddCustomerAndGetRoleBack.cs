@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using FluentResults;
+using FluentValidation;
 using MediatR;
 using MovieStore.Core.Enum;
 using MovieStore.Core.Model;
@@ -19,6 +20,14 @@ public static class AddCustomerAndGetRoleBack
     {
         [Required]
         public Role Role { get; set; }
+    }
+    
+    public class AddCustomerCommandValidator : AbstractValidator<Command> 
+    {
+        public AddCustomerCommandValidator()
+        {
+            RuleFor(x => x.Email).EmailAddress();
+        }
     }
     public class RequestHandler : IRequestHandler<Command, Result<Response>>
     {
